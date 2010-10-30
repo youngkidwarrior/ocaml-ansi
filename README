@@ -8,13 +8,6 @@ AUTHOR
    Christophe.Troestler@umons.ac.be
 
 
-LIMITATIONS
-
-  It was hoped that it works on window$ but, in order to have an ANSI
-  terminal, you have to run DOS only programs which OCaml programs are
-  not.  If anyone knows how to run it on windows, please write to me.
-
-
 COMPILE & INSTALL
 
   See the file INSTALL.

@@ -1,11 +1,11 @@
 (* File: ANSITerminal.mli
 
    Copyright 2004 Troestler Christophe
-   Christophe.Troestler(at)umh.ac.be
+   Christophe.Troestler(at)umons.ac.be
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public License
-   version 2.1 as published by the Free Software Foundation, with the
+   version 3 as published by the Free Software Foundation, with the
    special exception on linking described in file LICENSE.
 
    This library is distributed in the hope that it will be useful, but
@@ -16,12 +16,13 @@
 
 (** This module offers basic control of ANSI compliant terminals.
 
-  @author Christophe Troestler <chris_77\@users.sourceforge.net>
+  @author Christophe Troestler (Christophe.Troestler\@umons.ac.be)
   @version 0.4
 *)
 
-(** {2 Color} *)
+(** {2 Colors and style} *)
 
+(** Available colors. *)
 type color =
   | Black | Red | Green | Yellow | Blue | Magenta | Cyan | White
   | Default (** Default color of the terminal *)

@@ -1,2 +1,5 @@
+*.cm[ioax]
+*.cmxa
 ANSITerminal.ml
 .depend
+ANSITerminal.html
