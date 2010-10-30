@@ -41,94 +41,82 @@ type color_state = {
                    support that so scrapped. *)
 }
 
+let empty = { fore = [R;G;B]; back = [] ; bold = false }
+
 let state_of_styles sty =
-  let empty = { fore = [R;G;B]; back = [] ; bold = false } in
-  let rec f sta = function
-    | Reset :: l ->
-      f empty l
-      (* could stop there, but does not,
-         for exact compat with ansi *)
-      | Bold :: l ->
-        f {sta with bold = true } l
-      | Inverse :: l ->
+  List.fold_left (fun sta style ->
+    match style with
+    | Reset -> empty (* could stop there, but does not,
+                       for exact compat with ansi *)
+    | Bold -> {sta with bold = true }
+    | Inverse ->
         (* simulated inverse... not exact compat *)
         let oba = sta.back and ofo = sta.fore in
-        f {sta with fore = oba; back = ofo } l
-      | Foreground c :: l ->
-        f {sta with fore = rgb_of_color c } l
-      | Background c :: l ->
-        f {sta with back = rgb_of_color c } l
-      | _ :: l  ->
-        f sta l
-      | [] -> sta
-    in
-    f empty sty
+        {sta with fore = oba; back = ofo }
+    | Foreground c -> {sta with fore = rgb_of_color c }
+    | Background c -> {sta with back = rgb_of_color c }
+    | _  -> sta
+  ) empty sty
 
-  let int_of_state st =
-    (*  Quoth wincon.h
-    #define FOREGROUND_BLUE 1
-    #define FOREGROUND_GREEN  2
-    #define FOREGROUND_RED  4
-    #define FOREGROUND_INTENSITY  8
-    #define BACKGROUND_BLUE 16
-    #define BACKGROUND_GREEN  32
-    #define BACKGROUND_RED  64
-    #define BACKGROUND_INTENSITY  128
-    *)
-    let fo = function R -> 4  | G -> 2  | B -> 1
-    and ba = function R -> 64 | G -> 32 | B -> 16
-    and sum mode rgb = List.fold_left (lor) 0 (List.map mode rgb)
-    in
-    sum fo st.fore lor sum ba st.back lor (if st.bold then 8 else 0)
+let int_of_state st =
+  (* Quoth wincon.h
+     #define FOREGROUND_BLUE 1
+     #define FOREGROUND_GREEN  2
+     #define FOREGROUND_RED  4
+     #define FOREGROUND_INTENSITY  8
+     #define BACKGROUND_BLUE 16
+     #define BACKGROUND_GREEN  32
+     #define BACKGROUND_RED  64
+     #define BACKGROUND_INTENSITY  128 *)
+  let fo = function R -> 4  | G -> 2  | B -> 1
+  and ba = function R -> 64 | G -> 32 | B -> 16
+  and sum mode rgb = List.fold_left (lor) 0 (List.map mode rgb) in
+  sum fo st.fore lor sum ba st.back lor (if st.bold then 8 else 0)
   (*
-  let win_set_style code = printf "<%d>" code
-  let win_unset_style () = printf "<unset>"
+    let win_set_style code = printf "<%d>" code
+    let win_unset_style () = printf "<unset>"
   *)
 
-  external hook_set_style : int -> int = "hook_set_style"
-  external hook_unset_style : unit -> int = "hook_unset_style"
-  external hook_init : unit -> int = "hook_init"
+external hook_set_style : int -> int = "ANSITerminal_set_style"
+external hook_unset_style : unit -> int = "ANSITerminal_unset_style"
+external hook_init : unit -> int = "ANSITerminal_init"
 
-  exception Win32APIerror of string
+exception Win32APIerror of string
 
-  let safe msg hook x =
-    let return = hook x in
-    (*printf "[%s->%d]%!" msg (return);*)
-    (* if return <> 0 then printf "[%s->%d]" msg (pred return) *)
-    if return <> 0 then raise
-      (Win32APIerror (sprintf "%s(%d)" msg (pred return)))
+let safe msg hook x =
+  let return = hook x in
+  (*printf "[%s->%d]%!" msg (return);*)
+  (* if return <> 0 then printf "[%s->%d]" msg (pred return) *)
+  if return <> 0 then raise(Win32APIerror(sprintf "%s(%d)" msg (pred return)))
 
-  let win_set_style = safe "set_style" hook_set_style
-  let win_unset_style = safe "unset_style" hook_unset_style
-  let win_init = safe "init" hook_init
+let win_set_style = safe "set_style" hook_set_style
+let win_unset_style = safe "unset_style" hook_unset_style
+let win_init = safe "init" hook_init
 
-  let _ = win_init()
+let _ = win_init()
 
-  let set_style styles =
-    let st = int_of_state (state_of_styles styles) in
-    flush stdout;
-    win_set_style st;
-    flush stdout
+let set_style ch styles =
+  let st = int_of_state (state_of_styles styles) in
+  flush ch;
+  win_set_style st; (* FIXME: stderr *)
+  flush ch
 
-  let unset_style () = flush stdout; win_unset_style ()
-
-end
-
-let cross on_unix on_win =
-  match Sys.os_type with
-  | "Unix" -> on_unix
-  | _ -> on_win
-
-let set_style = cross Linux.set_style Windows.set_style
-let unset_style = cross Linux.unset_style Windows.unset_style
-
-let print styles txt =
-  set_style styles;
-  print_string txt;
-  flush stdout;
-  if !autoreset then unset_style()
-
-let printf style = kprintf (print style)
+let unset_style () = flush stdout; win_unset_style ()
 
 
-let print_string = print
+let print ch styles txt =
+  set_style ch styles;
+  output_string ch txt;
+  flush ch;
+  if !autoreset then unset_style() (* FIXME: stderr *)
+
+let print_string = print stdout
+let prerr_string = print stderr
+
+let printf style = kprintf (print_string style)
+
+
+
+(* Local Variables: *)
+(* compile-command: "ocamlc -annot -c ANSITerminal_windows.ml" *)
+(* End: *)
