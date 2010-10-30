@@ -1,5 +1,6 @@
 *.cm[ioax]
 *.cmxa
+*.annot
 ANSITerminal.ml
 .depend.ocaml
 ANSITerminal.html
