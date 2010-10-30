@@ -14,10 +14,12 @@
    LICENSE for more details.
 *)
 
-(** This module offers basic control of ANSI compliant terminals.
+(** This module offers basic control of ANSI compliant terminals and
+    the windows shell.
 
-  @author Christophe Troestler (Christophe.Troestler\@umons.ac.be)
-  @version 0.4
+    @author Christophe Troestler (Christophe.Troestler\@umons.ac.be)
+    @author Vincent Hugot (vincent.hugot\@gmail.com)
+    @version 0.5
 *)
 
 (** {2 Colors and style} *)

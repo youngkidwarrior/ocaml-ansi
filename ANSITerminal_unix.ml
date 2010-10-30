@@ -25,6 +25,7 @@
 (* man tty(4) *)
 
 open Printf
+include ANSITerminal_colors
 
 (* Erasing *)
 
@@ -115,40 +116,6 @@ let scroll lines =
   if lines > 0 then printf "\027[%iS" lines
   else if lines < 0 then printf "\027[%iT" (- lines)
 
-(* Colors *)
-
-let autoreset = ref true
-
-let set_autoreset b = autoreset := b
-
-
-type color =
-    Black | Red | Green | Yellow | Blue | Magenta | Cyan | White | Default
-
-type style =
-  | Reset | Bold | Underlined | Blink | Inverse | Hidden
-  | Foreground of color
-  | Background of color
-
-let black = Foreground Black
-let red = Foreground Red
-let green = Foreground Green
-let yellow = Foreground Yellow
-let blue = Foreground Blue
-let magenta = Foreground Magenta
-let cyan = Foreground Cyan
-let white = Foreground White
-let default = Foreground Default
-
-let on_black = Background Black
-let on_red = Background Red
-let on_green = Background Green
-let on_yellow = Background Yellow
-let on_blue = Background Blue
-let on_magenta = Background Magenta
-let on_cyan = Background Cyan
-let on_white = Background White
-let on_default = Background Default
 
 let style_to_string = function
   | Reset -> "0"
