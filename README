@@ -1,0 +1,35 @@
+PURPOSE
+
+  This module offers basic control of ANSI compliant terminals.
+
+
+AUTHOR
+
+   Christophe.Troestler@umons.ac.be
+
+
+LIMITATIONS
+
+  It was hoped that it works on window$ but, in order to have an ANSI
+  terminal, you have to run DOS only programs which OCaml programs are
+  not.  If anyone knows how to run it on windows, please write to me.
+
+
+COMPILE & INSTALL
+
+  See the file INSTALL.
+
+
+LICENCE
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public License
+   version 3 as published by the Free Software Foundation, with the
+   special exception on linking described in file LICENSE.
+
+   This library is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the file
+   LICENSE for more details.
+
+

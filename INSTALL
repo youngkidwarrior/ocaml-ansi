@@ -1,0 +1,32 @@
+* Unix
+******
+
+1. Compile library
+
+  make
+  make byte    # if you only want bytecode compilation
+  make opt     # if you only want native code compilation
+
+2. Example program
+
+  make ex
+
+3. Installation
+
+  Installation requires ocamlfind.
+
+  make install
+
+4. Documentation
+
+  make doc
+
+
+* Windows
+*********
+
+Typing "make" will compile the library and demonstration program to
+bytecode .
+
+It will only work if you get a ANSI compatible terminal.
+POINTERS NEEDED.

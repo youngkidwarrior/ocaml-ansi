@@ -1,0 +1,6 @@
+# Specifications for the Console module                   -*-shell-script-*-
+name = "ANSITerminal"
+description = "Basic console controlling functions."
+requires = ""
+archive(byte) = "ANSITerminal.cma"
+archive(native) = "ANSITerminal.cmxa"
