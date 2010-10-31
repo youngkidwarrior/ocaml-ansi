@@ -21,7 +21,7 @@ opt: ANSITerminal.cmxa
 
 ANSITerminal.ml: ANSITerminal_unix.ml
 	cp $< $@
-	$(MAKE) .depend.ocaml
+ANSITerminal.cmo ANSITerminal.cmx: ANSITerminal.cmi
 
 ANSITerminal.cma: ANSITerminal_colors.cmo ANSITerminal.cmo
 ANSITerminal.cmxa: ANSITerminal_colors.cmx ANSITerminal.cmx
