@@ -29,8 +29,6 @@ include ANSITerminal_colors
 
 (* Erasing *)
 
-type loc = Eol | Above | Below | Screen
-
 let erase loc =
   print_string(match loc with
   | Eol -> "\027[K"

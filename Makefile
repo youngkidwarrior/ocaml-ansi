@@ -10,7 +10,8 @@ DISTFILES    = LICENSE META.in Makefile Make.bat INSTALL README \
 
 PKG_TARBALL  = $(PKGNAME)-$(PKGVERSION).tar.bz2
 
-DOCFILES = ANSITerminal.mli
+INTERFACES = ANSITerminal.mli
+DOCFILES = $(INTERFACES)
 WEB = shell.forge.ocamlcore.org:/home/groups/ansiterminal/htdocs
 
 .PHONY: all opt byte mli
@@ -32,13 +33,16 @@ META: META.in
 # (Un)installation
 .PHONY: install uninstall
 install: all META
-	ocamlfind remove $(PKGNAME); \
-	[ -f "$(XARCHIVE)" ] && \
-	extra="$(XARCHIVE) $(basename $(XARCHIVE)).a"; \
-	ocamlfind install $(PKGNAME) $(MLI_FILES) $(CMI_FILES) $(ARCHIVE) META $$extra $(C_OBJS)
+	ocamlfind install $(PKGNAME) META $(INTERFACES) \
+	  $(INTERFACES:.mli=.cmi) ANSITerminal.cma \
+	  $(wildcard ANSITerminal.cmxa ANSITerminal.a ANSITerminal.cmx)
 
 uninstall:
 	ocamlfind remove $(PKGNAME)
+
+reinstall:
+	$(MAKE) uninstall
+	$(MAKE) install
 
 # Make the examples
 .PHONY: ex examples

@@ -1,4 +1,4 @@
-# Specifications for the Console module                   -*-shell-script-*-
+# Specifications for the Console module                   -*-conf-*-
 name = "ANSITerminal"
 description = "Basic console controlling functions."
 requires = ""
