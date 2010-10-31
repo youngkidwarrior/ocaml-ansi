@@ -19,16 +19,17 @@
 */
 
 #include <stdio.h>
-#include <caml/mlvalues.h> 
+#include <caml/mlvalues.h>
 #include <caml/io.h>
-#include <windows.h> 
+#include <windows.h>
 
 extern long _get_osfhandle(int);
 
 #define HANDLE_OF_CHAN(vchan) _get_osfhandle(Channel(vchan)->fd)
 
-CONSOLE_SCREEN_BUFFER_INFO csbiInfo; 
-WORD wOldColorAttrs; 
+HANDLE hStdout;
+CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
+WORD wOldColorAttrs;
 int i;
 
 // Get handles etc. Call once before doing anything else
@@ -36,23 +37,21 @@ int i;
 CAMLexport
 value ANSITerminal_init(value unit)
 {
-  HANDLE hStdout;  
-  
-  hStdout = GetStdHandle(STD_OUTPUT_HANDLE); 
-  if (hStdout == INVALID_HANDLE_VALUE) 
+  hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+  if (hStdout == INVALID_HANDLE_VALUE)
   {
     //MessageBox(NULL, TEXT("GetStdHandle"), TEXT("Console Error"), MB_OK);
     return Val_int(666);
   }
-  
-  // Save the current text colors. 
-  if (! GetConsoleScreenBufferInfo(hStdout, &csbiInfo)) 
+
+  // Save the current text colors.
+  if (! GetConsoleScreenBufferInfo(hStdout, &csbiInfo))
   {
     /* MessageBox(NULL, TEXT("GetConsoleScreenBufferInfo"),  */
     /*            TEXT("Console Error"), MB_OK);  */
     return Val_int(777);
   }
-  wOldColorAttrs = csbiInfo.wAttributes; 
+  wOldColorAttrs = csbiInfo.wAttributes;
   // everything is OK
   return Val_int(0);
 }
@@ -63,7 +62,7 @@ value ANSITerminal_set_style(value vchan, value ccode)
 {
   HANDLE h = HANDLE_OF_CHAN(vchan);
   int code = Int_val(vcode);
-  
+
   if (! SetConsoleTextAttribute(h, code) )
   {
     /* MessageBox(NULL, TEXT("SetConsoleTextAttribute"), */
@@ -75,13 +74,13 @@ value ANSITerminal_set_style(value vchan, value ccode)
 }
 
 
-// Restore the original text colors. 
+// Restore the original text colors.
 CAMLexport
 value ANSITerminal_unset_style(value vchan)
 {
   /* noalloc */
   HANDLE h = HANDLE_OF_CHAN(vchan);
-  
+
   if (! SetConsoleTextAttribute(hStdout, wOldColorAttrs) )
     {
       /* MessageBox(NULL, TEXT("SetConsoleTextAttribute"), */
@@ -89,4 +88,96 @@ value ANSITerminal_unset_style(value vchan)
       return Val_int(888);
     }
   return Val_int(0);
+}
+
+
+CAMLexport
+value ANSITerminal_pos(value vunit)
+{
+  CAMLparam1(vunit);
+  CAMLlocal1(vpos);
+  CONSOLE_SCREEN_BUFFER_INFO ConsoleScreenBufferInfo;
+
+  GetConsoleScreenBufferInfo(hStdout, &ConsoleScreenBufferInfo);
+
+  vpos = caml_alloc_tuple(2);
+  Store_field(vpos, 0, Val_int(ConsoleScreenBufferInfo.dwCursorPosition.X));
+  Store_field(vpos, 1, Val_int(ConsoleScreenBufferInfo.dwCursorPosition.Y));
+  CAMLreturn(vpos);
+}
+
+CAMLexport
+value ANSITerminal_size(value vunit)
+{
+  CAMLparam1(vunit);
+  CAMLlocal1(vsize);
+  CONSOLE_SCREEN_BUFFER_INFO ConsoleScreenBufferInfo;
+
+  /* Do not use the global var as the terminal can be resized */
+  GetConsoleScreenBufferInfo(hStdout, &ConsoleScreenBufferInfo);
+
+  vsize = caml_alloc_tuple(2);
+  Store_field(vsize, 0, Val_int(ConsoleScreenBufferInfo.dwSize.X));
+  Store_field(vsize, 1, Val_int(ConsoleScreenBufferInfo.dwSize.Y));
+
+  CAMLreturn(vsize);
+}
+
+CAMLexport
+value ANSITerminal_resize(value vx, value vy)
+{
+  /* noalloc */
+  COORD dwSize;
+  dwSize.X = Int_val(vx);
+  dwSize.Y = Int_val(vy);
+  SetConsoleScreenBufferSize(hStdout, dwSize);
+  return Val_unit;
+}
+
+
+CAMLexport
+value ANSITerminal_SetCursorPosition(value vx, value vy)
+{
+  COORD dwCursorPosition;
+  dwCursorPosition.X = Int_val(vx);
+  dwCursorPosition.Y = Int_val(vy);
+  SetConsoleCursorPosition(hStdout, dwCursorPosition);
+  return Val_unit;
+}
+
+
+
+CAMLexport
+value ANSITerminal_Scroll(value vx)
+{
+  /* noalloc */
+  INT x = Int_val(vx);
+  SMALL_RECT srctScrollRect, srctClipRect;
+  CHAR_INFO chiFill;
+  COORD coordDest;
+
+  srctScrollRect.Left = 0;
+  srctScrollRect.Top = 1;
+  srctScrollRect.Right = csbiInfo.dwSize.X - x;
+  srctScrollRect.Bottom = csbiInfo.dwSize.Y - x;
+
+  // The destination for the scroll rectangle is one row up.
+  coordDest.X = 0;
+  coordDest.Y = 0;
+
+  // The clipping rectangle is the same as the scrolling rectangle.
+  // The destination row is left unchanged.
+  srctClipRect = srctScrollRect;
+
+  // Set the fill character and attributes.
+  chiFill.Attributes = FOREGROUND_RED|FOREGROUND_INTENSITY;
+  chiFill.Char.AsciiChar = (char) ' ';
+
+  ScrollConsoleScreenBuffer(
+    hStdout,         // screen buffer handle
+    &srctScrollRect, // scrolling rectangle
+    &srctClipRect,   // clipping rectangle
+    coordDest,       // top left destination cell
+    &chiFill);       // fill character and color
+  return Val_unit;
 }

@@ -115,6 +115,59 @@ let prerr_string = print stderr
 
 let printf style = kprintf (print_string style)
 
+external set_cursor_ : int -> int -> unit = "ANSITerminal_SetCursorPosition"
+external pos_cursor : unit -> int * int = "ANSITerminal_pos"
+external scroll : int -> unit = "ANSITerminal_Scroll"
+external size : unit -> int * int = "ANSITerminal_size"
+external resize_ : int -> int -> unit = "ANSITerminal_resize"
+
+let set_cursor x y =
+  let x0, y0 = pos_cursor() in
+  let x = if x <= 0 then x0 else x
+  and y = if y <= 0 then y0 else y in
+  set_cursor_ x y (* FIXME: (x,y) outside the console?? *)
+
+let move_cursor dx dy =
+  let x0, y0 = pos_cursor() in
+  let x = x0 + dx and y = y0 + dy in
+  let x = if x <= 0 then 0 else x
+  and y = if y <= 0 then 0 else y in
+  set_cursor_ x y (* FIXME: (x,y) outside the console?? *)
+
+let move_bol () =
+  let _, y0 = pos_cursor() in
+  set_cursor_ 0 y0
+
+let saved_x = ref 0
+let saved_y = ref 0
+
+let save_cursor () =
+  let x,y = pos_cursor() in
+  saved_x := x;
+  saved_y := y
+
+let restore_cursor () =
+  set_cursor_ !saved_x !saved_y
+
+
+let resize x y =
+  (* The specified width and height cannot be less than the width and
+     height of the console screen buffer's window. *)
+  let xmin, ymin = size() in
+  let x = if x <= xmin then xmin else x
+  and y = if y <= ymin then ymin else y in
+  resize_ x y
+
+
+type loc = Eol | Above | Below | Screen
+
+(* FIXME: implement *)
+let erase loc =
+  match loc with
+  | Eol -> ()
+  | Above -> ()
+  | Below -> ()
+  | Screen -> ()
 
 
 (* Local Variables: *)
