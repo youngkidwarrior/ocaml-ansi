@@ -46,3 +46,6 @@ let on_magenta = Background Magenta
 let on_cyan = Background Cyan
 let on_white = Background White
 let on_default = Background Default
+
+
+type loc = Eol | Above | Below | Screen

@@ -159,8 +159,6 @@ let resize x y =
   resize_ x y
 
 
-type loc = Eol | Above | Below | Screen
-
 (* FIXME: implement *)
 let erase loc =
   match loc with

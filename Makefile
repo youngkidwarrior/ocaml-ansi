@@ -10,6 +10,9 @@ DISTFILES    = LICENSE META.in Makefile Make.bat INSTALL README \
 
 PKG_TARBALL  = $(PKGNAME)-$(PKGVERSION).tar.bz2
 
+DOCFILES = ANSITerminal.mli
+WEB = shell.forge.ocamlcore.org:/home/groups/ansiterminal/htdocs
+
 .PHONY: all opt byte mli
 all: byte opt
 byte: ANSITerminal.cma
@@ -42,6 +45,7 @@ uninstall:
 ex: examples
 examples: byte showcolors.exe
 
+.PHONY: doc upload-doc
 # Compile HTML documentation
 doc: $(DOCFILES) $(CMI_FILES)
 	@if [ -n "$(DOCFILES)" ] ; then \
@@ -49,6 +53,9 @@ doc: $(DOCFILES) $(CMI_FILES)
 	    $(OCAMLDOC) -v -d $(PKGNAME).html -html -stars -colorize-code \
 		-I +contrib $(ODOC_OPT) $(DOCFILES) ; \
 	fi
+
+upload-doc: doc
+	scp -r $(PKGNAME).html $(WEB)
 
 # Make a tarball
 .PHONY: dist
