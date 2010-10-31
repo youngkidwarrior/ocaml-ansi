@@ -9,7 +9,7 @@ SET LIB_OPT=ANSITerminal.cmxa
 
 copy ANSITerminal_windows.ml ANSITerminal.ml
 
-cl /c win.c /I "C:\lib"
+ocamlc -c -I +caml win.c
 
 %OCAMLC% %OCAMLCFLAGS% -c ANSITerminal.mli
 %OCAMLC% %OCAMLCFLAGS% -c ANSITerminal.ml
