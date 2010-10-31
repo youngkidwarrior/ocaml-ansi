@@ -77,38 +77,38 @@ let int_of_state st =
     let win_unset_style () = printf "<unset>"
   *)
 
-external hook_set_style : int -> int = "ANSITerminal_set_style"
-external hook_unset_style : unit -> int = "ANSITerminal_unset_style"
 external hook_init : unit -> int = "ANSITerminal_init"
+external hook_set_style : out_channel -> int -> int = "ANSITerminal_set_style"
+external hook_unset_style : out_channel -> int
+  = "ANSITerminal_unset_style"
 
 exception Win32APIerror of string
 
-let safe msg hook x =
-  let return = hook x in
+let safe msg return =
   (*printf "[%s->%d]%!" msg (return);*)
   (* if return <> 0 then printf "[%s->%d]" msg (pred return) *)
   if return <> 0 then raise(Win32APIerror(sprintf "%s(%d)" msg (pred return)))
 
-let win_set_style = safe "set_style" hook_set_style
-let win_unset_style = safe "unset_style" hook_unset_style
-let win_init = safe "init" hook_init
+let win_init () = safe "init" (hook_init())
+let win_set_style ch s = safe "set_style" (hook_set_style ch s)
+let win_unset_style ch = safe "unset_style" (hook_unset_style ch)
 
 let _ = win_init()
 
 let set_style ch styles =
   let st = int_of_state (state_of_styles styles) in
   flush ch;
-  win_set_style st; (* FIXME: stderr *)
+  win_set_style ch st;
   flush ch
 
-let unset_style () = flush stdout; win_unset_style ()
+let unset_style ch = flush ch; win_unset_style ch
 
 
 let print ch styles txt =
   set_style ch styles;
   output_string ch txt;
   flush ch;
-  if !autoreset then unset_style() (* FIXME: stderr *)
+  if !autoreset then unset_style ch
 
 let print_string = print stdout
 let prerr_string = print stderr
@@ -118,5 +118,5 @@ let printf style = kprintf (print_string style)
 
 
 (* Local Variables: *)
-(* compile-command: "ocamlc -annot -c ANSITerminal_windows.ml" *)
+(* compile-command: "make ANSITerminal_windows.cmo" *)
 (* End: *)

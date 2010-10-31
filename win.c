@@ -20,22 +20,24 @@
 
 #include <stdio.h>
 #include <caml/mlvalues.h> 
-
-#ifdef _WIN32
+#include <caml/io.h>
 #include <windows.h> 
-  HANDLE hStdout; 
-  CONSOLE_SCREEN_BUFFER_INFO csbiInfo; 
-  WORD wOldColorAttrs; 
-  int i;
-#endif
+
+extern long _get_osfhandle(int);
+
+#define HANDLE_OF_CHAN(vchan) _get_osfhandle(Channel(vchan)->fd)
+
+CONSOLE_SCREEN_BUFFER_INFO csbiInfo; 
+WORD wOldColorAttrs; 
+int i;
 
 // Get handles etc. Call once before doing anything else
 // returns 0 iff no problem
 CAMLexport
 value ANSITerminal_init(value unit)
 {
-#ifdef _WIN32
-  // Get handle to STDOUT.
+  HANDLE hStdout;  
+  
   hStdout = GetStdHandle(STD_OUTPUT_HANDLE); 
   if (hStdout == INVALID_HANDLE_VALUE) 
   {
@@ -51,40 +53,40 @@ value ANSITerminal_init(value unit)
     return Val_int(777);
   }
   wOldColorAttrs = csbiInfo.wAttributes; 
-#endif
   // everything is OK
   return Val_int(0);
 }
 
 
 CAMLexport
-value ANSITerminal_set_style(value ccode)
+value ANSITerminal_set_style(value vchan, value ccode)
 {
+  HANDLE h = HANDLE_OF_CHAN(vchan);
   int code = Int_val(vcode);
-#ifdef _WIN32
-  if (! SetConsoleTextAttribute(hStdout, code) )
+  
+  if (! SetConsoleTextAttribute(h, code) )
   {
     /* MessageBox(NULL, TEXT("SetConsoleTextAttribute"), */
     /*            TEXT("Console Error"), MB_OK); */
     printf("{%d}", code);
     return Val_int(1 + code);
   }
-#endif
   return Val_int(0);
 }
 
 
 // Restore the original text colors. 
 CAMLexport
-value ANSITerminal_unset_style(value unit)
+value ANSITerminal_unset_style(value vchan)
 {
-#ifdef _WIN32
+  /* noalloc */
+  HANDLE h = HANDLE_OF_CHAN(vchan);
+  
   if (! SetConsoleTextAttribute(hStdout, wOldColorAttrs) )
     {
       /* MessageBox(NULL, TEXT("SetConsoleTextAttribute"), */
       /*            TEXT("Console Error"), MB_OK); */
       return Val_int(888);
     }
-#endif
   return Val_int(0);
 }

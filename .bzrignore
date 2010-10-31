@@ -2,5 +2,6 @@
 *.cmxa
 *.annot
 ANSITerminal.ml
+ANSITerminal_windows.mli
 .depend.ocaml
 ANSITerminal.html
