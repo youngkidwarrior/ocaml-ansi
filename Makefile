@@ -6,7 +6,6 @@ PKGVERSION = $(shell grep "@version" ANSITerminal.mli | \
 SOURCES = ANSITerminal_colors.ml ANSITerminal.ml ANSITerminal.mli
 EXAMPLES = showcolors.ml test.ml
 OCAMLPACKS = unix
-LIBS_CMA = ANSITerminal.cma
 
 DISTFILES    = LICENSE META.in Makefile Make.bat INSTALL README \
 		$(wildcard *.ml) $(wildcard *.mli) $(wildcard examples/)
@@ -26,8 +25,12 @@ ANSITerminal.ml: ANSITerminal_unix.ml
 	cp $< $@
 ANSITerminal.cmo ANSITerminal.cmx: ANSITerminal.cmi
 
-ANSITerminal.cma: ANSITerminal_colors.cmo ANSITerminal.cmo
-ANSITerminal.cmxa: ANSITerminal_colors.cmx ANSITerminal.cmx
+ANSITerminal.cma ANSITerminal.cmxa: ANSITerminal_colors.ml ANSITerminal.ml \
+  ANSITerminal_unix_stubs.o
+	ocamlmklib -o $(basename $@) $^
+
+ANSITerminal_unix_stubs.o: ANSITerminal_unix_stubs.c
+	$(OCAMLC) -c $<
 
 META: META.in
 	sed -e "s/@VERSION@/$(PKGVERSION)/" $^ | \
@@ -50,10 +53,12 @@ reinstall:
 # Make the examples
 .PHONY: ex examples
 ex: examples
-examples: $(EXAMPLES:.ml=.exe)
+examples: $(EXAMPLES:.ml=.exe) $(EXAMPLES:.ml=.com)
 
-$(EXAMPLES:.ml=.exe): byte
-$(EXAMPLES:.ml=.com): native
+$(EXAMPLES:.ml=.exe): ANSITerminal.cma
+$(EXAMPLES:.ml=.com): ANSITerminal.cmxa
+# Include the current directory to find -lANSITerminal
+$(EXAMPLES:.ml=.com): OCAMLOPT_FLAGS=-I .
 
 .PHONY: doc upload-doc
 # Compile HTML documentation
@@ -86,7 +91,7 @@ include Makefile.ocaml
 
 .PHONY: clean distclean
 clean::
-	$(RM) -f META $(PKGNAME)-$(PKGVERSION).tar.bz2
+	$(RM) -f META $(PKGNAME)-$(PKGVERSION).tar.bz2 $(wildcard *.so)
 	$(RM) -rf $(PKGNAME).html/
 	find . -type f -perm +u=x -exec rm -f {} \;
 

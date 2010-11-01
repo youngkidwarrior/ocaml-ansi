@@ -82,10 +82,10 @@ let input_answer fdin =
   ignore(Unix.alarm 1);
   let buf = String.create 127 in
   let rec get_answer pos =
-    let c = input_char fdin in
+    let c = Unix.read fdin buf pos 1 in
     if !alarm then pos
     else if buf.[pos] = '\000' then get_answer pos
-    else if pos = 126 then pos + 1
+    else if pos = 126 then pos
     else get_answer (pos + 1) in
   let len = get_answer 0 in
   ignore(Unix.alarm 0);
@@ -95,14 +95,15 @@ let input_answer fdin =
 let pos_cursor () =
   with_ignored_signals (fun () ->
     save_cursor();
-    print_string "\027[r"; (* turn scroll region off *)
     (* Query Cursor Position	<ESC>[6n *)
-    print_string "\027[6n";
+    printf "\027[6n%!";
     (* Report Cursor Position	<ESC>[{ROW};{COLUMN}R *)
     try
       Scanf.sscanf (input_answer stdin) "\027[%d;%dR"
         (fun x y -> restore_cursor();  (x,y))
-    with _ -> failwith "ANSITerminal.pos_cursor"
+    with _ ->
+      restore_cursor();
+      failwith "ANSITerminal.pos_cursor"
   )
 
 (* See also the output of 'resize -s x y' (e.g. in an Emacs shell). *)
@@ -118,11 +119,9 @@ let resize width height =
      ESC [ 8 ; height ; width t
    It generates this line as if it were typed input, so it can then be
    read by your program on stdin. *)
-let size () =
-  (* http://www.splode.com/~friedman/software/emacs-lisp/src/xterm-frobs.el *)
-  printf "\027[18t%!";
-  sscanf (input_answer stdin) "\027[8;%d;%dt" (fun x y -> x,y)
+external size_ : Unix.file_descr -> int * int = "ANSITerminal_term_size"
 
+let size () = size_ Unix.stdin
 
 (* Scrolling *)
 
