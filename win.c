@@ -20,15 +20,16 @@
 
 #include <stdio.h>
 #include <caml/mlvalues.h>
+#include <caml/alloc.h>
+#include <caml/memory.h>
+#include <caml/misc.h>
 #include <windows.h>
 
-#include <caml/misc.h>
 #include "io.h"
 
-
+/* From otherlibs/win32unix/channels.c */
 extern long _get_osfhandle(int);
-
-#define HANDLE_OF_CHAN(vchan) _get_osfhandle(Channel(vchan)->fd)
+#define HANDLE_OF_CHAN(vchan) ((HANDLE) _get_osfhandle(Channel(vchan)->fd))
 
 HANDLE hStdout;
 CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
@@ -61,8 +62,9 @@ value ANSITerminal_init(value unit)
 
 
 CAMLexport
-value ANSITerminal_set_style(value vchan, value ccode)
+value ANSITerminal_set_style(value vchan, value vcode)
 {
+  /* noalloc */
   HANDLE h = HANDLE_OF_CHAN(vchan);
   int code = Int_val(vcode);
 
