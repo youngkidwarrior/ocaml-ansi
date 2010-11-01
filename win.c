@@ -22,23 +22,9 @@
 #include <caml/mlvalues.h>
 #include <windows.h>
 
-/* From io.h */
-extern struct channel {
-  int fd;                       /* Unix file descriptor */
-  file_offset offset;           /* Absolute position of fd in the file */
-  char * end;                   /* Physical end of the buffer */
-  char * curr;                  /* Current position in the buffer */
-  char * max;                   /* Logical end of the buffer (for input) */
-  void * mutex;                 /* Placeholder for mutex (for systhreads) */
-  struct channel * next, * prev;/* Double chaining of channels (flush_all) */
-  int revealed;                 /* For Cash only */
-  int old_revealed;             /* For Cash only */
-  int refcount;                 /* For flush_all and for Cash */
-  int flags;                    /* Bitfield */
-  char buff[IO_BUFFER_SIZE];    /* The buffer itself */
-};
+#include <caml/misc.h>
+#include "io.h"
 
-#define Channel(v) (*((struct channel **) (Data_custom_val(v))))
 
 extern long _get_osfhandle(int);
 
