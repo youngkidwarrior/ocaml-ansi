@@ -4,6 +4,9 @@ PKGVERSION = $(shell grep "@version" ANSITerminal.mli | \
 		  sed -e "s/[ *]*@version *\([0-9.]\+\).*/\1/")
 
 SOURCES = ANSITerminal_colors.ml ANSITerminal.ml ANSITerminal.mli
+EXAMPLES = showcolors.ml test.ml
+OCAMLPACKS = unix
+LIBS_CMA = ANSITerminal.cma
 
 DISTFILES    = LICENSE META.in Makefile Make.bat INSTALL README \
 		$(wildcard *.ml) $(wildcard *.mli) $(wildcard examples/)
@@ -27,8 +30,8 @@ ANSITerminal.cma: ANSITerminal_colors.cmo ANSITerminal.cmo
 ANSITerminal.cmxa: ANSITerminal_colors.cmx ANSITerminal.cmx
 
 META: META.in
-	cp $^ $@
-	echo "version = \"$(PKGVERSION)\"" >> $@
+	sed -e "s/@VERSION@/$(PKGVERSION)/" $^ | \
+	sed -e "s/@REQUIRES@/$(OCAMLPACKS)/" > $@
 
 # (Un)installation
 .PHONY: install uninstall
@@ -47,7 +50,10 @@ reinstall:
 # Make the examples
 .PHONY: ex examples
 ex: examples
-examples: byte showcolors.exe
+examples: $(EXAMPLES:.ml=.exe)
+
+$(EXAMPLES:.ml=.exe): byte
+$(EXAMPLES:.ml=.com): native
 
 .PHONY: doc upload-doc
 # Compile HTML documentation

@@ -1,6 +1,7 @@
 # Specifications for the Console module                   -*-conf-*-
 name = "ANSITerminal"
 description = "Basic console controlling functions."
-requires = ""
+version = "@VERSION@"
+requires = "@REQUIRES@"
 archive(byte) = "ANSITerminal.cma"
 archive(native) = "ANSITerminal.cmxa"
