@@ -30,10 +30,9 @@
 extern long _get_osfhandle(int);
 #define HANDLE_OF_CHAN(vchan) ((HANDLE) _get_osfhandle(Channel(vchan)->fd))
 
-HANDLE hStdout;
-CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
-WORD wOldColorAttrs;
-int i;
+static HANDLE hStdout;
+static CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
+static WORD wOldColorAttrs;
 
 // Get handles etc. Call once before doing anything else
 // returns 0 iff no problem
