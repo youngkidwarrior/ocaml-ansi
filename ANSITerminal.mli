@@ -125,7 +125,7 @@ val resize : int -> int -> unit
 
 val size : unit -> int * int
   (** [size()] returns a pair [(width, height)] giving the size of the
-      terminal. *)
+      terminal in character cells. *)
 
 
 (** {2 Scrolling} *)
