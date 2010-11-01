@@ -7,16 +7,16 @@ SET OCAMLOPTFLAGS=-annot
 SET LIB_BYTE=ANSITerminal.cma
 SET LIB_OPT=ANSITerminal.cmxa
 
-copy ANSITerminal_windows.ml ANSITerminal.ml
+copy ANSITerminal_win.ml ANSITerminal.ml
 
-ocamlc -c -I +caml ANSITerminal_stubs.c
+ocamlc -c -I +caml ANSITerminal_win_stubs.c
 
 %OCAMLC% %OCAMLCFLAGS% -c ANSITerminal.mli
 %OCAMLC% %OCAMLCFLAGS% -c ANSITerminal.ml
 %OCAMLC% %OCAMLCFLAGS% -a -o %LIB_BYTE%  ANSITerminal.cmo
 
 %OCAMLOPT% %OCAMLOPTFLAGS% -c ANSITerminal.ml
-%OCAMLOPT% %OCAMLOPTFLAGS% -a -o %LIB_OPT% ANSITerminal.cmx user32.lib ANSITerminal_stubs.obj
+%OCAMLOPT% %OCAMLOPTFLAGS% -a -o %LIB_OPT% ANSITerminal.cmx user32.lib ANSITerminal_win_stubs.obj
 
 %OCAMLC% %OCAMLCFLAGS% -o showcolors.exe %LIB_BYTE% showcolors.ml
 %OCAMLOPT% %OCAMLOPTFLAGS% -o showcolors.com %LIB_OPT% showcolors.ml
