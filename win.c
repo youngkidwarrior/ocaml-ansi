@@ -22,7 +22,6 @@
 #include <caml/mlvalues.h>
 #include <caml/alloc.h>
 #include <caml/memory.h>
-#include <caml/misc.h>
 #include <windows.h>
 
 #include "io.h"
