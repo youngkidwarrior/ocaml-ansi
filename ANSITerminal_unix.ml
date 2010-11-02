@@ -131,9 +131,12 @@ let resize width height =
      ESC [ 8 ; height ; width t
    It generates this line as if it were typed input, so it can then be
    read by your program on stdin. *)
-external size_ : Unix.file_descr -> int * int = "ANSITerminal_term_size"
+let size () =
+  try
+    send_and_read_response Unix.stdin "\027[18t" "\027[8;%d;%dt"
+      (fun y x -> (x,y))
+  with _ -> failwith "ANSITerminal.size"
 
-let size () = size_ Unix.stdin
 
 (* Scrolling *)
 
