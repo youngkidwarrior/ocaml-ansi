@@ -16,23 +16,23 @@ let color_to_string = function
   | T.Green -> "green"
   | T.Yellow -> "yellow"
   | T.Blue -> "blue"
-  | T.Magenta -> "magenta"
+  | T.Magenta -> "magent"
   | T.Cyan -> "cyan"
   | T.White -> "white"
-  | T.Default -> "default"
+  | T.Default -> "def"
 
 let () =
   (* Table *)
   let print_line fore =
-    printf "%7s " (color_to_string fore);
+    printf "%6s " (color_to_string fore);
     List.iter (fun back ->
                  T.print_string [T.Foreground fore; T.Background back; ]
-                 " Normal ";
+                 " XXXXXX ";
               ) colors;
     print_string "\n" in
 
-  T.erase T.Screen;
-  T.set_cursor 1 1;
+  (*T.erase T.Screen;
+  T.set_cursor 1 1;*)
   print_string "        ";
   List.iter (fun back -> printf "%7s " (color_to_string back)) colors;
   print_string "\n";
