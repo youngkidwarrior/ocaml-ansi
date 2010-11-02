@@ -23,11 +23,10 @@ opt: ANSITerminal.cmxa
 
 ANSITerminal.ml: ANSITerminal_unix.ml
 	cp $< $@
-ANSITerminal.cmo ANSITerminal.cmx: ANSITerminal.cmi
 
 ANSITerminal.cma ANSITerminal.cmxa: ANSITerminal_common.ml ANSITerminal.ml \
-  ANSITerminal_unix_stubs.o
-	ocamlmklib -o $(basename $@) $^
+  ANSITerminal_unix_stubs.o ANSITerminal.cmi
+	ocamlmklib -o $(basename $@) $(filter-out %.cmi, $^)
 
 ANSITerminal_unix_stubs.o: ANSITerminal_unix_stubs.c
 	$(OCAMLC) -c $<
