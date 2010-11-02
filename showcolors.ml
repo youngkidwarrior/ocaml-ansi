@@ -27,14 +27,14 @@ let () =
     printf "%6s " (color_to_string fore);
     List.iter (fun back ->
                  T.print_string [T.Foreground fore; T.Background back; ]
-                 " XXXXXX ";
+                 " !Text! ";
               ) colors;
     print_string "\n" in
 
   T.erase T.Screen;
   T.set_cursor 1 1;
   print_string "        ";
-  List.iter (fun back -> printf "%7s " (color_to_string back)) colors;
+  List.iter (fun back -> printf "%6s  " (color_to_string back)) colors;
   print_string "\n";
   List.iter print_line colors;
   (* Effects *)
