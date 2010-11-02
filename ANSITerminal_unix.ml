@@ -26,7 +26,7 @@
 
 open Printf
 open Scanf
-include ANSITerminal_colors
+include ANSITerminal_common
 
 (* Erasing *)
 

@@ -16,7 +16,7 @@
 *)
 
 open Printf
-include ANSITerminal_colors
+include ANSITerminal_common
 
 
 type rgb = R|G|B

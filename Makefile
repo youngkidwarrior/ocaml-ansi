@@ -3,7 +3,7 @@ PKGNAME	   = $(shell grep "name" META.in | sed -e "s/.*\"\([^\"]*\)\".*/\1/")
 PKGVERSION = $(shell grep "@version" ANSITerminal.mli | \
 		  sed -e "s/[ *]*@version *\([0-9.]\+\).*/\1/")
 
-SOURCES = ANSITerminal_colors.ml ANSITerminal.ml ANSITerminal.mli
+SOURCES = ANSITerminal_common.ml ANSITerminal.ml ANSITerminal.mli
 EXAMPLES = showcolors.ml test.ml
 OCAMLPACKS = unix
 
@@ -25,7 +25,7 @@ ANSITerminal.ml: ANSITerminal_unix.ml
 	cp $< $@
 ANSITerminal.cmo ANSITerminal.cmx: ANSITerminal.cmi
 
-ANSITerminal.cma ANSITerminal.cmxa: ANSITerminal_colors.ml ANSITerminal.ml \
+ANSITerminal.cma ANSITerminal.cmxa: ANSITerminal_common.ml ANSITerminal.ml \
   ANSITerminal_unix_stubs.o
 	ocamlmklib -o $(basename $@) $^
 
