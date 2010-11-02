@@ -31,8 +31,8 @@ let () =
               ) colors;
     print_string "\n" in
 
-  (*T.erase T.Screen;
-  T.set_cursor 1 1;*)
+  T.erase T.Screen;
+  T.set_cursor 1 1;
   print_string "        ";
   List.iter (fun back -> printf "%7s " (color_to_string back)) colors;
   print_string "\n";

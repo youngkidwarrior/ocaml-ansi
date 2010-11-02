@@ -159,15 +159,29 @@ let resize x y =
   resize_ x y
 
 
-(* FIXME: implement *)
+external fill : out_channel -> char -> n:int -> x:int -> y:int -> int
+  = "ANSITerminal_FillConsoleOutputCharacter"
+(* Writes the character to the console screen buffer [n] times,
+   beginning at the coordinates [(x,y)]. *)
+
 let erase loc =
+  let w, h = size() in
   match loc with
-  | Eol -> ()
-  | Above -> ()
-  | Below -> ()
-  | Screen -> ()
+  | Eol ->
+    let x, y = pos_cursor() in
+    ignore(fill stdout ' ' ~n:(w - x + 1) ~x ~y)
+  | Above ->
+    let x, y = pos_cursor() in
+    ignore(fill stdout ' ' ~n:((y - 1) * w + x) ~x:0 ~y:0);
+    set_cursor x y
+  | Below ->
+    let x, y = pos_cursor() in
+    ignore(fill stdout ' ' ~n:(w - x + 1 + (h - y) * w) ~x ~y);
+    set_cursor x y
+  | Screen ->
+    ignore(fill stdout ' ' ~n:(w * h) ~x:0 ~y:0)
 
 
 (* Local Variables: *)
-(* compile-command: "make ANSITerminal_windows.cmo" *)
+(* compile-command: "make ANSITerminal_win.cmo" *)
 (* End: *)

@@ -142,12 +142,29 @@ CAMLexport
 value ANSITerminal_SetCursorPosition(value vx, value vy)
 {
   COORD dwCursorPosition;
-  dwCursorPosition.X = Int_val(vx);
-  dwCursorPosition.Y = Int_val(vy);
+  /* The top lefmost coordinate is (1,1) for ANSITerminal while it is
+   * (0,0) for windows. */
+  dwCursorPosition.X = Int_val(vx) - 1;
+  dwCursorPosition.Y = Int_val(vy) - 1;
   SetConsoleCursorPosition(hStdout, dwCursorPosition);
   return Val_unit;
 }
 
+CAMLexport
+value ANSITerminal_FillConsoleOutputCharacter(
+  value vchan, value vc, value vlen, value vx, value vy)
+{
+  CAMLparam1(vchan);
+  HANDLE h = HANDLE_OF_CHAN(vchan);
+  int NumberOfCharsWritten;
+  COORD dwWriteCoord;
+  
+  dwWriteCoord.X = Int_val(vx) - 1;
+  dwWriteCoord.Y = Int_val(vy) - 1;
+  FillConsoleOutputCharacter(h, Int_val(vc), Int_val(vlen), dwWriteCoord,
+                             &NumberOfCharsWritten);
+  CAMLreturn(Val_int(NumberOfCharsWritten));
+}
 
 
 CAMLexport
