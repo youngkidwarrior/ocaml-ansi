@@ -108,7 +108,7 @@ val move_bol : unit -> unit
 
 val pos_cursor : unit -> int * int
   (** [pos_cursor()] returns a couple [(x,y)] giving the current
-      position of the cursor.  *)
+      position of the cursor, [x] being the column and [y] the row.  *)
 
 val save_cursor : unit -> unit
   (** [save_cursor()] saves the current position of the cursor. *)

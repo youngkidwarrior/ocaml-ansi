@@ -74,37 +74,49 @@ let with_ignored_signals f =
     Sys.set_signal Sys.sigint old_int;
     raise e
 
-(* Inpired by http://www.ohse.de/uwe/software/resize.c.html *)
-let input_answer fdin =
+(* Inpired by http://www.ohse.de/uwe/software/resize.c.html and
+   http://qemacs.sourcearchive.com/documentation/0.3.1.cvs.20050713-5/tty_8c-source.html *)
+let send_and_read_response fdin query fmt f =
   let alarm = ref false in
   let set_alarm (_:int) = alarm := true in
   let old_alarm = Sys.signal Sys.sigalrm (Sys.Signal_handle set_alarm) in
-  ignore(Unix.alarm 1);
-  let buf = String.create 127 in
+  let tty = Unix.tcgetattr fdin in
+  Unix.tcsetattr fdin Unix.TCSANOW { tty with
+    Unix.c_ignbrk = false; c_brkint = false; c_parmrk = false;
+    c_istrip = false; c_inlcr = false; c_igncr = false; c_icrnl = false;
+    c_ixon = false;  c_opost = true;
+    c_csize = 8;  c_parenb = false;  c_icanon = false; c_isig = false;
+    c_echo = false; c_echonl = false;
+    c_vmin = 1; c_vtime = 0 };
+  let restore() =
+    ignore(Unix.alarm 0);
+    Unix.tcsetattr fdin Unix.TCSANOW tty;
+    Sys.set_signal Sys.sigalrm old_alarm in
+  let buf = String.make 127 '\000' in
   let rec get_answer pos =
-    let c = Unix.read fdin buf pos 1 in
-    if !alarm then pos
-    else if buf.[pos] = '\000' then get_answer pos
-    else if pos = 126 then pos
-    else get_answer (pos + 1) in
-  let len = get_answer 0 in
-  ignore(Unix.alarm 0);
-  Sys.set_signal Sys.sigalrm old_alarm;
-  String.sub buf 0 len
+    let l = Unix.read fdin buf pos 1 in
+    try sscanf buf fmt f (* bail out as soon as enough info is present *)
+    with Scan_failure _ ->
+      if !alarm || pos = 126 then failwith "ANSITerminal.input_answer"
+      else if buf.[pos] = '\000' then get_answer pos
+      else get_answer (pos + l) in
+  try
+    ignore(Unix.write fdin query 0 (String.length query));
+    ignore(Unix.alarm 1);
+    let r = get_answer 0 in
+    restore();
+    r
+  with e ->
+    restore();
+    raise e
 
 let pos_cursor () =
-  with_ignored_signals (fun () ->
-    save_cursor();
-    (* Query Cursor Position	<ESC>[6n *)
-    printf "\027[6n%!";
-    (* Report Cursor Position	<ESC>[{ROW};{COLUMN}R *)
-    try
-      Scanf.sscanf (input_answer stdin) "\027[%d;%dR"
-        (fun x y -> restore_cursor();  (x,y))
-    with _ ->
-      restore_cursor();
-      failwith "ANSITerminal.pos_cursor"
-  )
+  (* Query Cursor Position	<ESC>[6n *)
+  (* Report Cursor Position	<ESC>[{ROW};{COLUMN}R *)
+  try
+    send_and_read_response Unix.stdin "\027[6n" "\027[%d;%dR" (fun y x -> (x,y))
+  with _ -> failwith "ANSITerminal.pos_cursor"
+
 
 (* See also the output of 'resize -s x y' (e.g. in an Emacs shell). *)
 let resize width height =
