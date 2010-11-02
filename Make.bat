@@ -12,8 +12,8 @@ copy ANSITerminal_win.ml ANSITerminal.ml
 ocamlc -c -I +caml ANSITerminal_win_stubs.c
 
 %OCAMLC% %OCAMLCFLAGS% -c ANSITerminal.mli
-%OCAMLC% %OCAMLCFLAGS% -c ANSITerminal.ml
 %OCAMLC% %OCAMLCFLAGS% -c ANSITerminal_common.ml
+%OCAMLC% %OCAMLCFLAGS% -c ANSITerminal.ml
 %OCAMLC% %OCAMLCFLAGS% -a -o %LIB_BYTE%  user32.lib ANSITerminal_win_stubs.obj ANSITerminal_common.cmo ANSITerminal.cmo
 %OCAMLC% %OCAMLCFLAGS% -o showcolors.exe %LIB_BYTE% showcolors.ml
 
