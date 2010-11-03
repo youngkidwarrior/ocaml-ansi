@@ -5,7 +5,8 @@ PKGVERSION = $(shell grep "@version" ANSITerminal.mli | \
 
 SOURCES = ANSITerminal_common.ml ANSITerminal.ml ANSITerminal.mli
 EXAMPLES = showcolors.ml test.ml
-OCAMLPACKS = unix
+LIBS_CMA  += unix.cma
+LIBS_CMXA += unix.cmxa
 
 DISTFILES    = LICENSE META.in Makefile Make.bat INSTALL README \
 		$(wildcard *.ml) $(wildcard *.mli) $(wildcard examples/)
@@ -37,13 +38,16 @@ META: META.in
 
 # (Un)installation
 .PHONY: install uninstall
+
 install: all META
-	ocamlfind install $(PKGNAME) META $(INTERFACES) \
+	@test -n "$(OCAMLFIND)" || \
+	  (echo "You need ocamlfind to install this library."; exit 1)
+	$(OCAMLFIND) install $(PKGNAME) META $(INTERFACES) \
 	  $(INTERFACES:.mli=.cmi) ANSITerminal.cma \
 	  $(wildcard ANSITerminal.cmxa ANSITerminal.a ANSITerminal.cmx)
 
 uninstall:
-	ocamlfind remove $(PKGNAME)
+	$(OCAMLFIND) remove $(PKGNAME)
 
 reinstall:
 	$(MAKE) uninstall
