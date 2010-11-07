@@ -18,6 +18,8 @@
 open Printf
 include ANSITerminal_common
 
+exception Error of string * string
+let () = Callback.register_exception "ANSITerminal.Error" (Error("",""))
 
 type rgb = R|G|B
 
@@ -77,23 +79,12 @@ let int_of_state st =
     let win_unset_style () = printf "<unset>"
   *)
 
-external hook_init : unit -> int = "ANSITerminal_init"
-external hook_set_style : out_channel -> int -> int = "ANSITerminal_set_style"
-external hook_unset_style : out_channel -> int
+external win_init : unit -> unit = "ANSITerminal_init"
+external win_set_style : out_channel -> int -> unit = "ANSITerminal_set_style"
+external win_unset_style : out_channel -> unit
   = "ANSITerminal_unset_style"
 
-exception Win32APIerror of string
-
-let safe msg return =
-  (*printf "[%s->%d]%!" msg (return);*)
-  (* if return <> 0 then printf "[%s->%d]" msg (pred return) *)
-  if return <> 0 then raise(Win32APIerror(sprintf "%s(%d)" msg (pred return)))
-
-let win_init () = safe "init" (hook_init())
-let win_set_style ch s = safe "set_style" (hook_set_style ch s)
-let win_unset_style ch = safe "unset_style" (hook_unset_style ch)
-
-let _ = win_init()
+let () = win_init()
 
 let set_style ch styles =
   let st = int_of_state (state_of_styles styles) in
@@ -162,7 +153,8 @@ let resize x y =
 external fill : out_channel -> char -> n:int -> x:int -> y:int -> int
   = "ANSITerminal_FillConsoleOutputCharacter"
 (* Writes the character to the console screen buffer [n] times,
-   beginning at the coordinates [(x,y)]. *)
+   beginning at the coordinates [(x,y)].  Returns the number of chars
+   actually written. *)
 
 let erase loc =
   let w, h = size() in

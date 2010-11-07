@@ -37,28 +37,74 @@ static HANDLE hStdout;
 static CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
 static WORD wOldColorAttrs;
 
+void raise_error(char *fname, char *msg)
+{
+  CAMLparam0();
+  CAMLlocal2(vfname, vmsg);
+  static value *exn = NULL;
+  value args[2];
+  
+  if (exn == NULL) {
+    /* First time around, look up by name */
+    exn = caml_named_value("ANSITerminal.Error");
+  }
+  vfname = caml_copy_string(fname);
+  vmsg = caml_copy_string(msg);
+  args[0] = vfname;
+  args[1] = vmsg;
+  caml_raise_with_args(*exn, 2, args);
+  CAMLnoreturn;
+}
+
+void exn_of_error(char *fname, BOOL cond)
+{
+  CAMLparam0();
+  CAMLlocal2(vfname, vmsg);
+  LPVOID MsgBuf;
+  static value *exn = NULL;
+  value args[2];
+  
+  if (cond) {
+    if (exn == NULL) {
+      /* First time around, look up by name */
+      exn = caml_named_value("ANSITerminal.Error");
+    }
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                  FORMAT_MESSAGE_FROM_SYSTEM |
+                  FORMAT_MESSAGE_IGNORE_INSERTS,
+                  NULL,
+                  GetLastError(),
+                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                  (LPTSTR) &lpMsgBuf,
+                  0, NULL);
+    vfname = caml_copy_string(fname);
+    vmsg = caml_copy_string((char *) lpMsgBuf);
+    LocalFree(lpMsgBuf);
+    args[0] = vfname;
+    args[1] = vmsg;
+    caml_raise_with_args(*exn, 2, args);
+  }
+  CAMLnoreturn;
+}
+
+
+
 // Get handles etc. Call once before doing anything else
 // returns 0 iff no problem
 CAMLexport
 value ANSITerminal_init(value unit)
 {
   hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-  if (hStdout == INVALID_HANDLE_VALUE)
-  {
-    //MessageBox(NULL, TEXT("GetStdHandle"), TEXT("Console Error"), MB_OK);
-    return Val_int(666);
+  if (hStdout == INVALID_HANDLE_VALUE) {
+    raise_error("Initialization", "Cannot get stdout handle");
   }
 
   // Save the current text colors.
   if (! GetConsoleScreenBufferInfo(hStdout, &csbiInfo))
   {
-    /* MessageBox(NULL, TEXT("GetConsoleScreenBufferInfo"),  */
-    /*            TEXT("Console Error"), MB_OK);  */
-    return Val_int(777);
+    raise_error("Initialization", "Cannot get screen info");
   }
   wOldColorAttrs = csbiInfo.wAttributes;
-  // everything is OK
-  return Val_int(0);
 }
 
 
@@ -69,16 +115,8 @@ value ANSITerminal_set_style(value vchan, value vcode)
   HANDLE h = HANDLE_OF_CHAN(vchan);
   int code = Int_val(vcode);
 
-  if (! SetConsoleTextAttribute(h, code) )
-  {
-    /* MessageBox(NULL, TEXT("SetConsoleTextAttribute"), */
-    /*            TEXT("Console Error"), MB_OK); */
-    printf("{%d}", code);
-    return Val_int(1 + code);
-  }
-  return Val_int(0);
+  exn_of_error("ANSITerminal.set_style", ! SetConsoleTextAttribute(h, code));
 }
-
 
 // Restore the original text colors.
 CAMLexport
@@ -87,13 +125,8 @@ value ANSITerminal_unset_style(value vchan)
   /* noalloc */
   HANDLE h = HANDLE_OF_CHAN(vchan);
 
-  if (! SetConsoleTextAttribute(hStdout, wOldColorAttrs) )
-    {
-      /* MessageBox(NULL, TEXT("SetConsoleTextAttribute"), */
-      /*            TEXT("Console Error"), MB_OK); */
-      return Val_int(888);
-    }
-  return Val_int(0);
+  exn_of_error("ANSITerminal.unset_style",
+               ! SetConsoleTextAttribute(hStdout, wOldColorAttrs) );
 }
 
 
@@ -105,7 +138,8 @@ value ANSITerminal_pos(value vunit)
   SMALL_RECT w;
   SHORT x, y;
 
-  GetConsoleScreenBufferInfo(hStdout, &csbiInfo);
+  exn_of_error("ANSITerminal.pos_cursor",
+               ! GetConsoleScreenBufferInfo(hStdout, &csbiInfo));
   w = csbiInfo.srWindow;
   x = csbiInfo.dwCursorPosition.X - w.Left + 1;
   y = csbiInfo.dwCursorPosition.Y - w.Top + 1;
@@ -124,7 +158,8 @@ value ANSITerminal_size(value vunit)
   SMALL_RECT w;
 
   /* Update the global var as the terminal may have been be resized */
-  GetConsoleScreenBufferInfo(hStdout, &csbiInfo);
+  exn_of_error("ANSITerminal.size",
+               ! GetConsoleScreenBufferInfo(hStdout, &csbiInfo));
   w = csbiInfo.srWindow;
 
   vsize = caml_alloc_tuple(2);
@@ -141,7 +176,8 @@ value ANSITerminal_resize(value vx, value vy)
   COORD dwSize;
   dwSize.X = Int_val(vx);
   dwSize.Y = Int_val(vy);
-  SetConsoleScreenBufferSize(hStdout, dwSize);
+  exn_of_error("ANSITerminal.resize",
+               ! SetConsoleScreenBufferSize(hStdout, dwSize));
   return Val_unit;
 }
 
@@ -150,12 +186,15 @@ CAMLexport
 value ANSITerminal_SetCursorPosition(value vx, value vy)
 {
   COORD dwCursorPosition;
+
+  exn_of_error("ANSITerminal.set_cursor",
+               ! GetConsoleScreenBufferInfo(hStdout, &csbiInfo));
   /* The top lefmost coordinate is (1,1) for ANSITerminal while it is
    * (0,0) for windows. */
-  GetConsoleScreenBufferInfo(hStdout, &csbiInfo);
   dwCursorPosition.X = Int_val(vx) - 1 + csbiInfo.srWindow.Left;
   dwCursorPosition.Y = Int_val(vy) - 1 + csbiInfo.srWindow.Top;
-  SetConsoleCursorPosition(hStdout, dwCursorPosition);
+  exn_of_error("ANSITerminal.set_cursor",
+               ! SetConsoleCursorPosition(hStdout, dwCursorPosition));
   return Val_unit;
 }
 
@@ -168,11 +207,14 @@ value ANSITerminal_FillConsoleOutputCharacter(
   int NumberOfCharsWritten;
   COORD dwWriteCoord;
 
-  GetConsoleScreenBufferInfo(hStdout, &csbiInfo);
+  exn_of_error("ANSITerminal.erase",
+               ! GetConsoleScreenBufferInfo(hStdout, &csbiInfo));
   dwWriteCoord.X = Int_val(vx) - 1 + csbiInfo.srWindow.Left;
   dwWriteCoord.Y = Int_val(vy) - 1 + csbiInfo.srWindow.Top;
-  FillConsoleOutputCharacter(h, Int_val(vc), Int_val(vlen), dwWriteCoord,
-                             &NumberOfCharsWritten);
+  exn_of_error("ANSITerminal.erase",
+               !FillConsoleOutputCharacter(h, Int_val(vc), Int_val(vlen),
+                                           dwWriteCoord,
+                                           &NumberOfCharsWritten));
   CAMLreturn(Val_int(NumberOfCharsWritten));
 }
 
@@ -203,11 +245,12 @@ value ANSITerminal_Scroll(value vx)
   chiFill.Attributes = FOREGROUND_RED|FOREGROUND_INTENSITY;
   chiFill.Char.AsciiChar = (char) ' ';
 
-  ScrollConsoleScreenBuffer(
-    hStdout,         // screen buffer handle
-    &srctScrollRect, // scrolling rectangle
-    &srctClipRect,   // clipping rectangle
-    coordDest,       // top left destination cell
-    &chiFill);       // fill character and color
+  exn_of_error("ANSITerminal.scroll",
+               ! ScrollConsoleScreenBuffer(
+                 hStdout,         // screen buffer handle
+                 &srctScrollRect, // scrolling rectangle
+                 &srctClipRect,   // clipping rectangle
+                 coordDest,       // top left destination cell
+                 &chiFill);       // fill character and color
   return Val_unit;
 }
