@@ -84,6 +84,7 @@ let send_and_read_response fdin query fmt f =
     Unix.tcsetattr fdin Unix.TCSANOW tty;
     Sys.set_signal Sys.sigalrm old_alarm in
   let buf = String.make 127 '\000' in
+  (* FIXME: make it more robust so that it ignores previous key pressed. *)
   let rec get_answer pos =
     let l = Unix.read fdin buf pos 1 in
     try sscanf buf fmt f (* bail out as soon as enough info is present *)

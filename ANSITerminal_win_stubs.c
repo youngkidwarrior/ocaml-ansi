@@ -3,6 +3,9 @@
    Allow colors, cursor movements, erasing,... under Unix and DOS shells.
    *********************************************************************
 
+   Copyright 2010 by Christophe Troestler <Christophe.Troestler@umons.ac.be>
+   http://math.umons.ac.be/an/software/
+
    Copyright 2010 by Vincent Hugot
    vincent.hugot@gmail.com
    www.vincent-hugot.com
@@ -99,13 +102,17 @@ value ANSITerminal_pos(value vunit)
 {
   CAMLparam1(vunit);
   CAMLlocal1(vpos);
-  CONSOLE_SCREEN_BUFFER_INFO ConsoleScreenBufferInfo;
+  SMALL_RECT w;
+  SHORT x, y;
 
-  GetConsoleScreenBufferInfo(hStdout, &ConsoleScreenBufferInfo);
+  GetConsoleScreenBufferInfo(hStdout, &csbiInfo);
+  w = csbiInfo.srWindow;
+  x = csbiInfo.dwCursorPosition.X - w.Left + 1;
+  y = csbiInfo.dwCursorPosition.Y - w.Top + 1;
 
   vpos = caml_alloc_tuple(2);
-  Store_field(vpos, 0, Val_int(ConsoleScreenBufferInfo.dwCursorPosition.X));
-  Store_field(vpos, 1, Val_int(ConsoleScreenBufferInfo.dwCursorPosition.Y));
+  Store_field(vpos, 0, Val_int(x));
+  Store_field(vpos, 1, Val_int(y));
   CAMLreturn(vpos);
 }
 
@@ -114,14 +121,15 @@ value ANSITerminal_size(value vunit)
 {
   CAMLparam1(vunit);
   CAMLlocal1(vsize);
-  CONSOLE_SCREEN_BUFFER_INFO ConsoleScreenBufferInfo;
+  SMALL_RECT w;
 
-  /* Do not use the global var as the terminal can be resized */
-  GetConsoleScreenBufferInfo(hStdout, &ConsoleScreenBufferInfo);
+  /* Update the global var as the terminal may have been be resized */
+  GetConsoleScreenBufferInfo(hStdout, &csbiInfo);
+  w = csbiInfo.srWindow;
 
   vsize = caml_alloc_tuple(2);
-  Store_field(vsize, 0, Val_int(ConsoleScreenBufferInfo.dwSize.X));
-  Store_field(vsize, 1, Val_int(ConsoleScreenBufferInfo.dwSize.Y));
+  Store_field(vsize, 0, Val_int(w.Right - w.Left + 1));
+  Store_field(vsize, 1, Val_int(w.Bottom - w.Top + 1));
 
   CAMLreturn(vsize);
 }
@@ -144,8 +152,9 @@ value ANSITerminal_SetCursorPosition(value vx, value vy)
   COORD dwCursorPosition;
   /* The top lefmost coordinate is (1,1) for ANSITerminal while it is
    * (0,0) for windows. */
-  dwCursorPosition.X = Int_val(vx) - 1;
-  dwCursorPosition.Y = Int_val(vy) - 1;
+  GetConsoleScreenBufferInfo(hStdout, &csbiInfo);
+  dwCursorPosition.X = Int_val(vx) - 1 + csbiInfo.srWindow.Left;
+  dwCursorPosition.Y = Int_val(vy) - 1 + csbiInfo.srWindow.Top;
   SetConsoleCursorPosition(hStdout, dwCursorPosition);
   return Val_unit;
 }
@@ -158,9 +167,10 @@ value ANSITerminal_FillConsoleOutputCharacter(
   HANDLE h = HANDLE_OF_CHAN(vchan);
   int NumberOfCharsWritten;
   COORD dwWriteCoord;
-  
-  dwWriteCoord.X = Int_val(vx) - 1;
-  dwWriteCoord.Y = Int_val(vy) - 1;
+
+  GetConsoleScreenBufferInfo(hStdout, &csbiInfo);
+  dwWriteCoord.X = Int_val(vx) - 1 + csbiInfo.srWindow.Left;
+  dwWriteCoord.Y = Int_val(vy) - 1 + csbiInfo.srWindow.Top;
   FillConsoleOutputCharacter(h, Int_val(vc), Int_val(vlen), dwWriteCoord,
                              &NumberOfCharsWritten);
   CAMLreturn(Val_int(NumberOfCharsWritten));
