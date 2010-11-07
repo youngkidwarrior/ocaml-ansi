@@ -141,6 +141,7 @@ value ANSITerminal_pos(value vunit)
   exn_of_error("ANSITerminal.pos_cursor",
                ! GetConsoleScreenBufferInfo(hStdout, &csbiInfo));
   w = csbiInfo.srWindow;
+  /* The topmost left character has pos (1,1) */
   x = csbiInfo.dwCursorPosition.X - w.Left + 1;
   y = csbiInfo.dwCursorPosition.Y - w.Top + 1;
 

@@ -164,12 +164,10 @@ let erase loc =
     ignore(fill stdout ' ' ~n:(w - x + 1) ~x ~y)
   | Above ->
     let x, y = pos_cursor() in
-    ignore(fill stdout ' ' ~n:((y - 1) * w + x) ~x:1 ~y:1);
-    set_cursor x y
+    ignore(fill stdout ' ' ~n:((y - 1) * w + x) ~x:1 ~y:1)
   | Below ->
     let x, y = pos_cursor() in
-    ignore(fill stdout ' ' ~n:(w - x + 1 + (h - y) * w) ~x ~y);
-    set_cursor x y
+    ignore(fill stdout ' ' ~n:(w - x + 1 + (h - y) * w) ~x ~y)
   | Screen ->
     ignore(fill stdout ' ' ~n:(w * h) ~x:1 ~y:1)
 

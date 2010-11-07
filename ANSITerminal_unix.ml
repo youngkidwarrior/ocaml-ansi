@@ -130,13 +130,12 @@ let size () = size_ Unix.stdin
 (* Erasing *)
 
 let erase loc =
-  match loc with
-  | Eol -> printf "\027[K%!"
-  | Above -> printf "\027[1J%!"
-  | Below -> printf "\027[0J%!"
-  | Screen ->
-    print_string "\027[2J";
-    set_cursor 1 1 (* flush *)
+  print_string (match loc with
+  | Eol -> "\027[K"
+  | Above -> "\027[1J"
+  | Below ->"\027[0J"
+  | Screen -> "\027[2J");
+  flush stdout
 
 (* Scrolling *)
 
