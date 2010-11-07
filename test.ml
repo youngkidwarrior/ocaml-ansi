@@ -7,6 +7,7 @@ let () =
   printf "In 1sec the screen will be cleared and cursor put at (1,1).%!";
   Unix.sleep 1;
   T.erase T.Screen;
+  T.set_cursor 1 1;
   Unix.sleep 1;
 
   let x, y = T.size() in
