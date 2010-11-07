@@ -17,6 +17,8 @@
 (** This module offers basic control of ANSI compliant terminals and
     the windows shell.
 
+    This library is not thread safe.
+
     @author Christophe Troestler (Christophe.Troestler\@umons.ac.be)
     @author Vincent Hugot (vincent.hugot\@gmail.com)
     @version 0.5
