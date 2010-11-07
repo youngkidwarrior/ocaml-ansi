@@ -28,32 +28,23 @@ open Printf
 open Scanf
 include ANSITerminal_common
 
-(* Erasing *)
-
-let erase loc =
-  print_string(match loc with
-  | Eol -> "\027[K"
-  | Above -> "\027[1J"
-  | Below -> "\027[0J"
-  | Screen -> "\027[2J")
-
 
 (* Cursor *)
 
 let set_cursor x y =
-  if x <= 0 then (if y > 0 then printf "\027[%id" y)
-  else (* x > 0 *) if y <= 0 then printf "\027[%iG" x
-  else printf "\027[%i;%iH" y x
+  if x <= 0 then (if y > 0 then printf "\027[%id%!" y)
+  else (* x > 0 *) if y <= 0 then printf "\027[%iG%!" x
+  else printf "\027[%i;%iH%!" y x
 
 let move_cursor x y =
-  if x > 0 then printf "\027[%iC" x
-  else if x < 0 then printf "\027[%iD" (-x);
-  if y > 0 then printf "\027[%iB" y
-  else if y < 0 then printf "\027[%iA" (-y)
+  if x > 0 then printf "\027[%iC%!" x
+  else if x < 0 then printf "\027[%iD%!" (-x);
+  if y > 0 then printf "\027[%iB%!" y
+  else if y < 0 then printf "\027[%iA%!" (-y)
 
-let save_cursor () = print_string "\027[s"
-let restore_cursor () = print_string "\027[u"
-let move_bol () = print_string "\r"
+let save_cursor () = printf "\027[s%!"
+let restore_cursor () = printf "\027[u%!"
+let move_bol () = print_string "\r"; flush stdout
 
 let with_ignored_signals f =
   let old_int = Sys.signal Sys.sigint Sys.Signal_ignore
@@ -135,11 +126,22 @@ external size_ : Unix.file_descr -> int * int = "ANSITerminal_term_size"
 
 let size () = size_ Unix.stdin
 
+(* Erasing *)
+
+let erase loc =
+  match loc with
+  | Eol -> printf "\027[K%!"
+  | Above -> printf "\027[1J%!"
+  | Below -> printf "\027[0J%!"
+  | Screen ->
+    print_string "\027[2J";
+    set_cursor 1 1 (* flush *)
+
 (* Scrolling *)
 
 let scroll lines =
-  if lines > 0 then printf "\027[%iS" lines
-  else if lines < 0 then printf "\027[%iT" (- lines)
+  if lines > 0 then printf "\027[%iS%!" lines
+  else if lines < 0 then printf "\027[%iT%!" (- lines)
 
 
 let style_to_string = function

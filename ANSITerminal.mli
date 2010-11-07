@@ -85,8 +85,8 @@ val erase : loc -> unit
       without moving the cursor.
       [erase Above] erases everything before the position of the cursor.
       [erase Below] erases everything after the position of the cursor.
-      [erase Screen] erases the whole screen.
-  *)
+      [erase Screen] erases the whole screen and put the cursor at
+      position (1,1).  *)
 
 
 (** {2 Cursor} *)
