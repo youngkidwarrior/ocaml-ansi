@@ -21,3 +21,4 @@ ocamlc -c -I +caml ANSITerminal_win_stubs.c
 %OCAMLOPT% %OCAMLOPTFLAGS% -c ANSITerminal_common.ml
 %OCAMLOPT% %OCAMLOPTFLAGS% -a -o %LIB_OPT% ANSITerminal_common.cmx ANSITerminal.cmx user32.lib ANSITerminal_win_stubs.obj
 %OCAMLOPT% %OCAMLOPTFLAGS% -o showcolors.com %LIB_OPT% showcolors.ml
+%OCAMLOPT% %OCAMLOPTFLAGS% -o test.com unix.cmxa  %LIB_OPT% test.ml
