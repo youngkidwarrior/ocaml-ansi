@@ -84,7 +84,7 @@ void exn_of_error(char *fname, BOOL cond)
     args[1] = vmsg;
     caml_raise_with_args(*exn, 2, args);
   }
-  CAMLnoreturn;
+  CAMLreturn0;
 }
 
 
