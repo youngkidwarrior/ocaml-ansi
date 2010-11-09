@@ -121,8 +121,8 @@ let set_cursor x y =
 let move_cursor dx dy =
   let x0, y0 = pos_cursor() in
   let x = x0 + dx and y = y0 + dy in
-  let x = if x <= 0 then 0 else x
-  and y = if y <= 0 then 0 else y in
+  let x = if x <= 0 then 1 else x
+  and y = if y <= 0 then 1 else y in
   set_cursor_ x y (* FIXME: (x,y) outside the console?? *)
 
 let move_bol () =
