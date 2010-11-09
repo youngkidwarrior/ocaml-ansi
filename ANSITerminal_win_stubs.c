@@ -191,16 +191,21 @@ value ANSITerminal_resize(value vx, value vy)
 CAMLexport
 value ANSITerminal_SetCursorPosition(value vx, value vy)
 {
-  COORD dwCursorPosition;
-
+  COORD c;
+  SMALL_RECT w;
+  
   exn_of_error("ANSITerminal.set_cursor",
                ! GetConsoleScreenBufferInfo(hStdout, &csbiInfo));
   /* The top lefmost coordinate is (1,1) for ANSITerminal while it is
    * (0,0) for windows. */
-  dwCursorPosition.X = Int_val(vx) - 1 + csbiInfo.srWindow.Left;
-  dwCursorPosition.Y = Int_val(vy) - 1 + csbiInfo.srWindow.Top;
+  w = csbiInfo.srWindow;
+  c.X = Int_val(vx) - 1 + w.Left;
+  c.Y = Int_val(vy) - 1 + w.srWindow.Top;
+
+  if (c.X > w.Right) c.X = w.Right;
+  if (c.Y > w.Bottom) c.Y = w.Bottom;
   exn_of_error("ANSITerminal.set_cursor",
-               ! SetConsoleCursorPosition(hStdout, dwCursorPosition));
+               ! SetConsoleCursorPosition(hStdout, c));
   return Val_unit;
 }
 
