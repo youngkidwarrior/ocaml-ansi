@@ -209,7 +209,11 @@ value ANSITerminal_SetCursorPosition(value vx, value vy)
   w = csbiInfo.srWindow;
   c.X = Int_val(vx) - 1 + w.Left;
   c.Y = Int_val(vy) - 1 + w.Top;
-
+  
+  // very subtle debugging method...
+  fprintf(stderr,"vx,vy = %d,%d --> [c.X,Y = %d,%d ; L %d R %d T %d B %d]\n", 
+          Int_val(vx),Int_val(vy), c.X, c.Y, w.Left, w.Right, w.Top, w.Bottom);
+          
   if (c.X > w.Right) c.X = w.Right;
   if (c.Y > w.Bottom) c.Y = w.Bottom;
   exn_of_error("ANSITerminal.set_cursor",
