@@ -105,6 +105,8 @@ value ANSITerminal_init(value unit)
     raise_error("Initialization", "Cannot get screen info");
   }
   wOldColorAttrs = csbiInfo.wAttributes;
+  
+  return Val_unit;
 }
 
 
@@ -116,6 +118,7 @@ value ANSITerminal_set_style(value vchan, value vcode)
   int code = Int_val(vcode);
 
   exn_of_error("ANSITerminal.set_style", ! SetConsoleTextAttribute(h, code));
+  return Val_unit;
 }
 
 // Restore the original text colors.
@@ -127,6 +130,7 @@ value ANSITerminal_unset_style(value vchan)
 
   exn_of_error("ANSITerminal.unset_style",
                ! SetConsoleTextAttribute(hStdout, wOldColorAttrs) );
+  return Val_unit;
 }
 
 
