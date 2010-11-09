@@ -22,6 +22,7 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 #include <caml/mlvalues.h>
 #include <caml/alloc.h>
 #include <caml/memory.h>
@@ -61,6 +62,7 @@ void exn_of_error(char *fname, BOOL cond)
 {
   CAMLparam0();
   CAMLlocal2(vfname, vmsg);
+  char *msg, *p;
   LPVOID lpMsgBuf;
   static value *exn = NULL;
   value args[2];
@@ -79,7 +81,13 @@ void exn_of_error(char *fname, BOOL cond)
                   (LPTSTR) &lpMsgBuf,
                   0, NULL);
     vfname = caml_copy_string(fname);
-    vmsg = caml_copy_string((char *) lpMsgBuf);
+    msg = (char *) lpMsgBuf;
+    p = msg + strlen(msg) - 1; 
+    while(*p == '\n' || *p == '\r') {
+      *p = '\0';
+      p--;
+    }
+    vmsg = caml_copy_string(msg);
     LocalFree(lpMsgBuf);
     args[0] = vfname;
     args[1] = vmsg;
