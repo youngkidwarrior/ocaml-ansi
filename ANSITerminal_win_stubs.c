@@ -208,7 +208,7 @@ value ANSITerminal_SetCursorPosition(value vx, value vy)
    * (0,0) for windows. */
   w = csbiInfo.srWindow;
   c.X = Int_val(vx) - 1 + w.Left;
-  c.Y = Int_val(vy) - 1 + w.srWindow.Top;
+  c.Y = Int_val(vy) - 1 + w.Top;
 
   if (c.X > w.Right) c.X = w.Right;
   if (c.Y > w.Bottom) c.Y = w.Bottom;
