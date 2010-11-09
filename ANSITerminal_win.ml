@@ -127,7 +127,7 @@ let move_cursor dx dy =
 
 let move_bol () =
   let _, y0 = pos_cursor() in
-  set_cursor_ 0 y0
+  set_cursor_ 1 y0
 
 let saved_x = ref 0
 let saved_y = ref 0
