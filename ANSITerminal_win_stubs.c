@@ -60,7 +60,7 @@ void exn_of_error(char *fname, BOOL cond)
 {
   CAMLparam0();
   CAMLlocal2(vfname, vmsg);
-  LPVOID MsgBuf;
+  LPVOID lpMsgBuf;
   static value *exn = NULL;
   value args[2];
   
@@ -252,6 +252,6 @@ value ANSITerminal_Scroll(value vx)
                  &srctScrollRect, // scrolling rectangle
                  &srctClipRect,   // clipping rectangle
                  coordDest,       // top left destination cell
-                 &chiFill);       // fill character and color
+                 &chiFill));      // fill character and color
   return Val_unit;
 }
