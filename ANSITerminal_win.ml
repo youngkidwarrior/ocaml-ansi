@@ -1,8 +1,11 @@
-(* File: ANSITerminal_unix.ml
+(* File: ANSITerminal_win.ml
 
    Copyright 2010 by Vincent Hugot
    vincent.hugot@gmail.com
    www.vincent-hugot.com
+
+   Copyright 2010 by Troestler Christophe
+   Christophe.Troestler@umons.ac.be
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public License
