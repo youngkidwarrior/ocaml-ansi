@@ -21,7 +21,6 @@
 
     @author Christophe Troestler (Christophe.Troestler\@umons.ac.be)
     @author Vincent Hugot (vincent.hugot\@gmail.com)
-    @version 0.5
 *)
 
 (** {2 Colors and style} *)
