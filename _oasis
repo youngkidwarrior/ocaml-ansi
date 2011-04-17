@@ -39,3 +39,8 @@ Executable test
   BuildDepends:   ANSITerminal
   BuildTools:     ocamlbuild
   Install:        false
+
+SourceRepository trunk
+  Type:       svn
+  Location:   svn://scm.ocamlcore.org/svn/ansiterminal/trunk
+  Browser:    https://forge.ocamlcore.org/scm/browser.php?group_id=187
