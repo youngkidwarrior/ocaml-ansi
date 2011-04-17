@@ -1,7 +1,7 @@
 #                                                               -*-conf-*-
 OASISFormat: 0.2
 Name:        ANSITerminal
-Version:     0.5
+Version:     0.6
 Synopsis:    Basic control of ANSI compliant terminals and the windows shell.
 Authors:     Christophe Troestler, Vincent Hugot
 License:     LGPL-3.0 with OCaml linking exception
