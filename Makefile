@@ -1,9 +1,12 @@
 
 PKGNAME	    = $(shell oasis query name)
 PKGVERSION  = $(shell oasis query version)
-PKG_TARBALL = $(PKGNAME)-$(PKGVERSION).tar.bz2
+PKG_TARBALL = $(PKGNAME)-$(PKGVERSION).tar.gz
 
-DISTFILES   = LICENSE.txt AUTHORS.txt INSTALL.txt README.txt META Makefile \
+DISTFILES   = LICENSE.txt AUTHORS.txt INSTALL.txt README.txt _oasis \
+	_tags META Makefile ANSITerminal.mllib libANSITerminal.clib \
+	ANSITerminal_unix_stubs.c ANSITerminal_win_stubs.c \
+	setup.ml API.odocl \
 	$(wildcard *.ml) $(wildcard *.mli) $(wildcard examples/)
 
 WEB = shell.forge.ocamlcore.org:/home/groups/ansiterminal/htdocs
@@ -27,14 +30,14 @@ upload-doc: doc
 
 
 # Make a tarball
-.PHONY: dist
-dist: $(DISTFILES) setup.ml
+.PHONY: dist tar
+dist tar: $(DISTFILES)
 	@ if [ -z "$(PKGNAME)" ]; then echo "PKGNAME not defined"; exit 1; fi
 	@ if [ -z "$(PKGVERSION)" ]; then \
 		echo "PKGVERSION not defined"; exit 1; fi
 	mkdir $(PKGNAME)-$(PKGVERSION)
 	cp -r $(DISTFILES) $(PKGNAME)-$(PKGVERSION)/
-	tar -jcvf $(PKG_TARBALL) $(PKGNAME)-$(PKGVERSION)
+	tar -zcvf $(PKG_TARBALL) $(PKGNAME)-$(PKGVERSION)
 	rm -rf $(PKGNAME)-$(PKGVERSION)
 
 
