@@ -13,16 +13,17 @@ WEB = shell.forge.ocamlcore.org:/home/groups/ansiterminal/htdocs
 
 .PHONY: all byte native configure doc install uninstall reinstall upload-doc
 
-all byte native: configure
+all byte native setup.log: setup.data
 	ocaml setup.ml -build
 
-configure: setup.ml
-	ocaml $< -configure
+configure: setup.data
+setup.data: setup.ml
+	ocaml setup.ml -configure
 
 setup.ml: _oasis
 	oasis setup
 
-doc install uninstall reinstall:
+doc install uninstall reinstall: setup.log
 	ocaml setup.ml -$@
 
 upload-doc: doc
@@ -48,4 +49,4 @@ clean::
 
 distclean:
 	ocaml setup.ml -distclean
-	$(RM) $(wildcard *.ba[0-9] *.bak *~ *.odocl) setup.log
+	$(RM) $(wildcard *.ba[0-9] *.bak *~ *.odocl)
