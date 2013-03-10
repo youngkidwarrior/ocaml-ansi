@@ -1,7 +1,7 @@
 #                                                               -*-conf-*-
 OASISFormat: 0.3
 Name:        ANSITerminal
-Version:     0.6.1
+Version:     0.6.2
 Synopsis:    Basic control of ANSI compliant terminals and the windows shell.
 Description: ANSITerminal is a module allowing to use the colors and cursor movements on ANSI terminals. It also works on the windows shell (but this part is currently work in progress).
 Authors:     Christophe Troestler, Vincent Hugot
