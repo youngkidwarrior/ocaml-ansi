@@ -4,10 +4,9 @@ PKGVERSION  = $(shell oasis query version)
 PKG_TARBALL = $(PKGNAME)-$(PKGVERSION).tar.gz
 
 DISTFILES   = LICENSE.txt AUTHORS.txt INSTALL.txt README.txt _oasis \
-	_tags META Makefile ANSITerminal.mllib libANSITerminal.clib \
-	ANSITerminal_unix_stubs.c ANSITerminal_win_stubs.c \
-	setup.ml API.odocl \
-	$(wildcard *.ml) $(wildcard *.mli) $(wildcard examples/)
+	_tags META Makefile \
+	$(wildcard $(addprefix src/, *.ml *.mli *.c)) \
+	$(wildcard *.ml) $(wildcard examples/)
 
 WEB = shell.forge.ocamlcore.org:/home/groups/ansiterminal/htdocs
 
@@ -37,7 +36,7 @@ dist tar: $(DISTFILES)
 	@ if [ -z "$(PKGVERSION)" ]; then \
 		echo "PKGVERSION not defined"; exit 1; fi
 	mkdir $(PKGNAME)-$(PKGVERSION)
-	cp -ar $(DISTFILES) $(PKGNAME)-$(PKGVERSION)/
+	cp -a --parents $(DISTFILES) $(PKGNAME)-$(PKGVERSION)/
 #	Make a setup.ml that does not need oasis.
 	cd $(PKGNAME)-$(PKGVERSION) && oasis setup
 	tar -zcvf $(PKG_TARBALL) $(PKGNAME)-$(PKGVERSION)
