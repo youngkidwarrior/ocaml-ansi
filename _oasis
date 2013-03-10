@@ -11,7 +11,7 @@ PostConfCommand: ocaml choose_implementation.ml
 Homepage:    https://forge.ocamlcore.org/projects/ansiterminal/    
 
 Library "ANSITerminal"
-  Path:         .
+  Path:         src/
   BuildTools:   ocamlbuild
   Modules:      ANSITerminal
   InternalModules: ANSITerminal_common

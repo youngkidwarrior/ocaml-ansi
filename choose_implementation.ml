@@ -3,9 +3,9 @@
 
 open Printf
 
-let copy_file source target =
-  let fh0 = open_in source in
-  let fh1 = open_out target in
+let copy_file ?(dir="src") source target =
+  let fh0 = open_in (Filename.concat dir source) in
+  let fh1 = open_out (Filename.concat dir target) in
   let buf = String.create 4096 in
   let len = ref 1 in
   while !len > 0 do
