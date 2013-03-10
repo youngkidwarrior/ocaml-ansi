@@ -36,7 +36,7 @@ dist tar: $(DISTFILES)
 	@ if [ -z "$(PKGVERSION)" ]; then \
 		echo "PKGVERSION not defined"; exit 1; fi
 	mkdir $(PKGNAME)-$(PKGVERSION)
-	cp -a --parents $(DISTFILES) $(PKGNAME)-$(PKGVERSION)/
+	cp -p --parents --dereference $(DISTFILES) $(PKGNAME)-$(PKGVERSION)/
 #	Make a setup.ml that does not need oasis.
 	cd $(PKGNAME)-$(PKGVERSION) && oasis setup
 	tar -zcvf $(PKG_TARBALL) $(PKGNAME)-$(PKGVERSION)
