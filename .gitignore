@@ -5,8 +5,8 @@
 ANSITerminal.ml
 ANSITerminal_stubs.c
 .depend.ocaml
-*.exe
-*.com
+*.byte
+*.native
 ANSITerminal.html
 META
 *.tar.gz
@@ -17,6 +17,7 @@ libANSITerminal.clib
 setup.data
 setup.ml
 API.docdir
+*.clib
 
 setup.log
 showcolors.native

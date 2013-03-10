@@ -21,7 +21,7 @@ setup.data: setup.ml
 	ocaml setup.ml -configure
 
 setup.ml: _oasis
-	oasis setup
+	oasis setup -setup-update dynamic
 
 doc install uninstall reinstall: setup.log
 	ocaml setup.ml -$@
@@ -37,7 +37,9 @@ dist tar: $(DISTFILES)
 	@ if [ -z "$(PKGVERSION)" ]; then \
 		echo "PKGVERSION not defined"; exit 1; fi
 	mkdir $(PKGNAME)-$(PKGVERSION)
-	cp -r $(DISTFILES) $(PKGNAME)-$(PKGVERSION)/
+	cp -ar $(DISTFILES) $(PKGNAME)-$(PKGVERSION)/
+#	Make a setup.ml that does not need oasis.
+	cd $(PKGNAME)-$(PKGVERSION) && oasis setup
 	tar -zcvf $(PKG_TARBALL) $(PKGNAME)-$(PKGVERSION)
 	rm -rf $(PKGNAME)-$(PKGVERSION)
 
