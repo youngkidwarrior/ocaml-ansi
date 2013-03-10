@@ -71,10 +71,13 @@ val prerr_string : style list -> string -> unit
   (** Like [print_string] but prints on the standard error. *)
 
 val printf : style list -> ('a, unit, string, unit) format4 -> 'a
-  (** [printf attr format arg1 ... argN] prints the arguments
+(** [printf attr format arg1 ... argN] prints the arguments
     [arg1],...,[argN] according to [format] with the attibutes [attr].
     After printing, the attributes are automatically reseted to the
     defaults, unless autoreset is turned off. *)
+
+val eprintf : style list -> ('a, unit, string, unit) format4 -> 'a
+(** Same as {!printf} but prints the result on [stderr]. *)
 
 
 (** {2 Erasing} *)

@@ -190,3 +190,4 @@ let prerr_string style txt =
 
 let printf style = ksprintf (print_string style)
 
+let eprintf style = ksprintf (prerr_string style)
