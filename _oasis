@@ -1,11 +1,13 @@
 #                                                               -*-conf-*-
 OASISFormat: 0.3
 Name:        ANSITerminal
-Version:     0.6.3
+Version:     0.6.4
 Synopsis:    Basic control of ANSI compliant terminals and the windows shell.
 Description: ANSITerminal is a module allowing to use the colors and cursor movements on ANSI terminals. It also works on the windows shell (but this part is currently work in progress).
 Authors:     Christophe Troestler, Vincent Hugot
+Maintainers: Christophe Troestler <Christophe.Troestler@umons.ac.be>
 License:     LGPL-3.0 with OCaml linking exception
+Categories:  http://terminal
 Plugins:     META (0.3), StdFiles (0.3)
 PostConfCommand: ocaml choose_implementation.ml
 Homepage:    https://forge.ocamlcore.org/projects/ansiterminal/    
