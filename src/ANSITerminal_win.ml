@@ -111,6 +111,8 @@ let printf style = kprintf (print_string style)
 
 let eprintf style = ksprintf (prerr_string style)
 
+let sprintf style = sprintf
+
 external set_cursor_ : int -> int -> unit = "ANSITerminal_SetCursorPosition"
 external pos_cursor : unit -> int * int = "ANSITerminal_pos"
 external scroll : int -> unit = "ANSITerminal_Scroll"

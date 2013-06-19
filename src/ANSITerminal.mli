@@ -79,6 +79,12 @@ val printf : style list -> ('a, unit, string, unit) format4 -> 'a
 val eprintf : style list -> ('a, unit, string, unit) format4 -> 'a
 (** Same as {!printf} but prints the result on [stderr]. *)
 
+val sprintf : style list -> ('a, unit, string) format -> 'a
+(** Same as {!printf} but returns the result in a string.  This only
+    works on ANSI compliant terminals — for which escape sequences are
+    used — and not under Windows — where system calls are required.
+    On Windows, it is identical to the standard [sprintf]. *)
+
 
 (** {2 Erasing} *)
 

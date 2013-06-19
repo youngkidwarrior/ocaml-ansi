@@ -171,23 +171,26 @@ let style_to_string = function
   | Background Default -> "49"
 
 
-let print_string style txt =
-  print_string "\027[";
-  let s = String.concat ";" (List.map style_to_string style) in
-  print_string s;
-  print_string "m";
-  print_string txt;
-  if !autoreset then print_string "\027[0m"
+let print_with pr style txt =
+  pr "\027[";
+  pr (String.concat ";" (List.map style_to_string style));
+  pr "m";
+  pr txt;
+  if !autoreset then pr "\027[0m"
 
-let prerr_string style txt =
-  prerr_string "\027[";
-  let s = String.concat ";" (List.map style_to_string style) in
-  prerr_string s;
-  prerr_string "m";
-  prerr_string txt;
-  if !autoreset then prerr_string "\027[0m"
+let print_string style txt = print_with print_string style txt
 
+let prerr_string style txt = print_with prerr_string style txt
 
 let printf style = ksprintf (print_string style)
 
 let eprintf style = ksprintf (prerr_string style)
+
+let to_string style txt =
+  let s = "\027["
+          ^ String.concat ";" (List.map style_to_string style)
+          ^ "m"
+          ^ txt in
+  if !autoreset then s ^ "\027[0m" else s
+
+let sprintf style = ksprintf (to_string style)
