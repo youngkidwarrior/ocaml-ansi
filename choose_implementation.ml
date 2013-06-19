@@ -5,7 +5,9 @@ open Printf
 
 let copy_file ?(dir="src") source target =
   let fh0 = open_in (Filename.concat dir source) in
-  let fh1 = open_out (Filename.concat dir target) in
+  let target = Filename.concat dir target in
+  (try Sys.remove target with _ -> ());
+  let fh1 = open_out_gen [Open_wronly; Open_creat; Open_trunc] 0o444 target in
   let buf = String.create 4096 in
   let len = ref 1 in
   while !len > 0 do

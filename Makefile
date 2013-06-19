@@ -16,7 +16,7 @@ all byte native setup.log: setup.data
 	ocaml setup.ml -build
 
 configure: setup.data
-setup.data: setup.ml
+setup.data: setup.ml $(wildcard $(addprefix src/, *.ml *.mli *.c))
 	ocaml setup.ml -configure
 
 setup.ml: _oasis
