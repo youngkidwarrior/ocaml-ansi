@@ -28,6 +28,9 @@ doc install uninstall reinstall: setup.log
 upload-doc: doc
 	scp -C -p -r _build/API.docdir $(WEB)
 
+test: all
+	CAML_LD_LIBRARY_PATH=_build/src/ ./test.byte 
+
 
 # Make a tarball
 .PHONY: dist tar
@@ -46,7 +49,7 @@ dist tar: $(DISTFILES)
 .PHONY: clean distclean
 clean::
 	ocaml setup.ml -clean
-	$(RM) $(PKG_TARBALL)
+	$(RM) $(PKG_TARBALL) setup.data
 
 distclean:
 	ocaml setup.ml -distclean
