@@ -22,5 +22,5 @@ ocamlfind install ANSITerminal ANSITerminal.cmi ANSITerminal.mli ANSITerminal.cm
 cd ..
 REM ocamlfind list
 ocamlfind ocamlc -verbose -o showcolors.exe -package ANSITerminal -linkpkg showcolors.ml
-dir
-REM Cannot execute showcolors.exe, AppVeyor is not a Windows shell.
+
+dir showcolors.exe
