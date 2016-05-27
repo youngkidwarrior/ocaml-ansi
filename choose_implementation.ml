@@ -8,12 +8,9 @@ let copy_file ?(dir="src") source target =
   let target = Filename.concat dir target in
   (try Sys.remove target with _ -> ());
   let fh1 = open_out_gen [Open_wronly; Open_creat; Open_trunc] 0o444 target in
-  let buf = String.create 4096 in
-  let len = ref 1 in
-  while !len > 0 do
-    len := input fh0 buf 0 4096;
-    output fh1 buf 0 !len
-  done;
+  let content = Buffer.create 4096 in
+  Buffer.add_channel content fh0 (in_channel_length fh0);
+  Buffer.output_buffer fh1 content;
   close_in fh0;
   close_out fh1
 
