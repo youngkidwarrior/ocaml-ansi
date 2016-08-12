@@ -83,17 +83,18 @@ let send_and_read_response fdin query fmt f =
     ignore(Unix.alarm 0);
     Unix.tcsetattr fdin Unix.TCSANOW tty;
     Sys.set_signal Sys.sigalrm old_alarm in
-  let buf = String.make 127 '\000' in
+  let buf = Bytes.make 127 '\000' in
   (* FIXME: make it more robust so that it ignores previous key pressed. *)
   let rec get_answer pos =
     let l = Unix.read fdin buf pos 1 in
+    let buf = Bytes.unsafe_to_string buf in (* local use only *)
     try sscanf buf fmt f (* bail out as soon as enough info is present *)
     with Scan_failure _ ->
       if !alarm || pos = 126 then failwith "ANSITerminal.input_answer"
       else if buf.[pos] = '\000' then get_answer pos
       else get_answer (pos + l) in
   try
-    ignore(Unix.write fdin query 0 (String.length query));
+    ignore(Unix.write fdin query 0 (Bytes.length query));
     ignore(Unix.alarm 1);
     let r = get_answer 0 in
     restore();
@@ -102,11 +103,13 @@ let send_and_read_response fdin query fmt f =
     restore();
     raise e
 
+(* Query Cursor Position	<ESC>[6n *)
+(* Report Cursor Position	<ESC>[{ROW};{COLUMN}R *)
+let pos_cursor_query = Bytes.of_string "\027[6n"
 let pos_cursor () =
-  (* Query Cursor Position	<ESC>[6n *)
-  (* Report Cursor Position	<ESC>[{ROW};{COLUMN}R *)
   try
-    send_and_read_response Unix.stdin "\027[6n" "\027[%d;%dR" (fun y x -> (x,y))
+    send_and_read_response Unix.stdin pos_cursor_query
+                           "\027[%d;%dR" (fun y x -> (x,y))
   with _ -> failwith "ANSITerminal.pos_cursor"
 
 

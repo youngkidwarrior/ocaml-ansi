@@ -18,7 +18,7 @@ Library "ANSITerminal"
   Modules:      ANSITerminal
   InternalModules: ANSITerminal_common
   CSources:     ANSITerminal_stubs.c
-  BuildDepends: unix
+  BuildDepends: unix, bytes
   
 Document API
   Title:           API reference for ANSITerminal
