@@ -3,8 +3,7 @@ PKGNAME	    = $(shell oasis query name)
 PKGVERSION  = $(shell oasis query version)
 PKG_TARBALL = $(PKGNAME)-$(PKGVERSION).tar.gz
 
-DISTFILES   = LICENSE.txt AUTHORS.txt INSTALL.txt README.txt _oasis \
-	_tags META Makefile \
+DISTFILES   = _oasis _tags Makefile \
 	$(wildcard $(addprefix src/, *.ml *.mli *.c)) \
 	$(wildcard *.ml) $(wildcard examples/)
 
