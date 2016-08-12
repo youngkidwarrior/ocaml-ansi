@@ -29,6 +29,7 @@ Document API
   XOCamlbuildLibraries: ANSITerminal
 
 Executable showcolors
+  Build$:         flag(tests)
   Path:           .
   MainIs:         showcolors.ml
   BuildDepends:   ANSITerminal
@@ -37,6 +38,7 @@ Executable showcolors
   Install:        false
 
 Executable test
+  Build$:         flag(tests)
   Path:           .
   MainIs:         test.ml
   BuildDepends:   ANSITerminal
