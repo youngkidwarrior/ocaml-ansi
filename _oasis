@@ -7,7 +7,7 @@ Description: ANSITerminal is a module allowing to use the colors and cursor move
 Authors:     Christophe Troestler, Vincent Hugot
 Maintainers: Christophe Troestler <Christophe.Troestler@umons.ac.be>
 License:     LGPL-3.0 with OCaml linking exception
-Categories:  http://terminal
+Tags:	     terminal
 Plugins:     META (0.3), StdFiles (0.3)
 PostConfCommand: ocaml choose_implementation.ml
 Homepage:    https://github.com/Chris00/ANSITerminal
@@ -19,7 +19,7 @@ Library "ANSITerminal"
   InternalModules: ANSITerminal_common
   CSources:     ANSITerminal_stubs.c
   BuildDepends: unix, bytes
-  
+
 Document API
   Title:           API reference for ANSITerminal
   Type:            OCamlbuild (0.3)
@@ -45,7 +45,7 @@ Executable test
   BuildTools:     ocamlbuild
   Install:        false
 
-SourceRepository trunk
+SourceRepository master
   Type:       git
   Location:   https://github.com/Chris00/ANSITerminal.git
   Browser:    https://github.com/Chris00/ANSITerminal
