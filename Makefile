@@ -11,7 +11,7 @@ WEB = shell.forge.ocamlcore.org:/home/groups/ansiterminal/htdocs
 
 .PHONY: all byte native configure doc install uninstall reinstall upload-doc
 
-all byte native setup.log: setup.data
+all byte native setup.log: setup.data opam/opam
 	ocaml setup.ml -build
 
 configure: setup.data
@@ -23,6 +23,9 @@ setup.ml: _oasis
 
 doc install uninstall reinstall: setup.log
 	ocaml setup.ml -$@
+
+opam/opam: _oasis
+	oasis2opam --local -y
 
 upload-doc: doc
 	scp -C -p -r _build/API.docdir $(WEB)
