@@ -46,25 +46,6 @@ let save_cursor () = printf "\027[s%!"
 let restore_cursor () = printf "\027[u%!"
 let move_bol () = print_string "\r"; flush stdout
 
-let with_ignored_signals f =
-  let old_int = Sys.signal Sys.sigint Sys.Signal_ignore
-  and old_quit = Sys.signal Sys.sigquit Sys.Signal_ignore
-  and old_hup = Sys.signal Sys.sighup Sys.Signal_ignore
-  and old_term = Sys.signal Sys.sigterm Sys.Signal_ignore in
-  try
-    let x = f() in
-    Sys.set_signal Sys.sigterm old_term;
-    Sys.set_signal Sys.sighup old_hup;
-    Sys.set_signal Sys.sigquit old_quit;
-    Sys.set_signal Sys.sigint old_int;
-    x
-  with e ->
-    Sys.set_signal Sys.sigterm old_term;
-    Sys.set_signal Sys.sighup old_hup;
-    Sys.set_signal Sys.sigquit old_quit;
-    Sys.set_signal Sys.sigint old_int;
-    raise e
-
 (* Inpired by http://www.ohse.de/uwe/software/resize.c.html and
    http://qemacs.sourcearchive.com/documentation/0.3.1.cvs.20050713-5/tty_8c-source.html *)
 let send_and_read_response fdin query fmt f =
