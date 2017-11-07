@@ -39,23 +39,39 @@ type style =
   | Background of color
 
 val black : style	(** Shortcut for [Foreground Black] *)
+
 val red : style 	(** Shortcut for [Foreground Red] *)
+
 val green : style	(** Shortcut for [Foreground Green] *)
+
 val yellow : style	(** Shortcut for [Foreground Yellow] *)
+
 val blue : style	(** Shortcut for [Foreground Blue] *)
+
 val magenta : style	(** Shortcut for [Foreground Magenta] *)
+
 val cyan : style	(** Shortcut for [Foreground Cyan] *)
+
 val white : style	(** Shortcut for [Foreground White] *)
+
 val default : style	(** Shortcut for [Foreground Default] *)
 
 val on_black : style	(** Shortcut for [Background Black] *)
+
 val on_red : style 	(** Shortcut for [Background Red] *)
+
 val on_green : style	(** Shortcut for [Background Green] *)
+
 val on_yellow : style	(** Shortcut for [Background Yellow] *)
+
 val on_blue : style	(** Shortcut for [Background Blue] *)
+
 val on_magenta : style	(** Shortcut for [Background Magenta] *)
+
 val on_cyan : style	(** Shortcut for [Background Cyan] *)
+
 val on_white : style	(** Shortcut for [Background White] *)
+
 val on_default : style	(** Shortcut for [Background Default] *)
 
 val set_autoreset : bool -> unit
@@ -124,6 +140,7 @@ val pos_cursor : unit -> int * int
 
 val save_cursor : unit -> unit
 (** [save_cursor()] saves the current position of the cursor. *)
+
 val restore_cursor : unit -> unit
   (** [restore_cursor()] replaces the cursor to the position saved
     with [save_cursor()]. *)
