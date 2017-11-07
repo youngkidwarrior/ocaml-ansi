@@ -3,7 +3,7 @@
 
 open Printf
 
-let copy_file ?(line_directive=false) ?(dir="src") source target =
+let copy_file ?(line_directive=false) ?(dir=".") source target =
   let fh0 = open_in (Filename.concat dir source) in
   let target = Filename.concat dir target in
   (try Sys.remove target with _ -> ());

@@ -1,6 +1,4 @@
-(* File: ANSITerminal_colors.ml
-
-   Copyright 2004 by Troestler Christophe
+(* Copyright 2004 by Troestler Christophe
    Christophe.Troestler(at)umons.ac.be
 
    This library is free software; you can redistribute it and/or
