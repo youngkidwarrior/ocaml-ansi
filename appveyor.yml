@@ -8,9 +8,6 @@ install:
 
 build_script:
   - cd "%APPVEYOR_BUILD_FOLDER%"
-  # - ocaml setup.ml -configure --enable-tests --prefix "%OCAMLROOT%"
-  # - ocaml setup.ml -build
-  # - ocaml setup.ml -info -install
   - build.cmd
 
 test_script:

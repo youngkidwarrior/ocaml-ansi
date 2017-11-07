@@ -1,8 +1,8 @@
 REM Build ANSITerminal until oasis/ocamlbuild works on Windows
 
-ocaml choose_implementation.ml
-
 cd src
+
+ocaml ../choose_implementation.ml
 
 ocamlc -verbose -c ANSITerminal_stubs.c
 
@@ -19,7 +19,7 @@ ocamlmklib -verbose -o ANSITerminal ANSITerminal_common.ml ANSITerminal.ml ANSIT
 
 ocamlfind install ANSITerminal ANSITerminal.cmi ANSITerminal.mli ANSITerminal.cma ANSITerminal.cmxa ANSITerminal.cmx ANSITerminal_common.cmx dllANSITerminal.dll libANSITerminal.lib ANSITerminal_stubs.obj META
 
-cd ..
+cd ../tests
 REM ocamlfind list
 ocamlfind ocamlc -verbose -o showcolors.exe -package ANSITerminal -linkpkg showcolors.ml
 
