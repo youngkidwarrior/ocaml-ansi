@@ -2,7 +2,7 @@ REM Build ANSITerminal until oasis/ocamlbuild works on Windows
 
 cd src
 
-ocaml ../choose_implementation.ml
+ocaml choose_implementation.ml
 
 ocamlc -verbose -c ANSITerminal_stubs.c
 

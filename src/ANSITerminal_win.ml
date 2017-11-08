@@ -24,6 +24,11 @@ include ANSITerminal_common
 exception Error of string * string
 let () = Callback.register_exception "ANSITerminal.Error" (Error("",""))
 
+let isatty = ref Unix.isatty
+
+let is_out_channel_atty ch = !isatty(Unix.descr_of_out_channel ch)
+
+
 type rgb = R|G|B
 
 let rgb_of_color = function
@@ -99,10 +104,11 @@ let unset_style ch = flush ch; win_unset_style ch
 
 
 let print ch styles txt =
-  set_style ch styles;
+  let tty = is_out_channel_atty ch in
+  if tty then set_style ch styles;
   output_string ch txt;
   flush ch;
-  if !autoreset then unset_style ch
+  if tty && !autoreset then unset_style ch
 
 let print_string = print stdout
 let prerr_string = print stderr
@@ -120,41 +126,51 @@ external size : unit -> int * int = "ANSITerminal_size"
 external resize_ : int -> int -> unit = "ANSITerminal_resize"
 
 let set_cursor x y =
-  let x0, y0 = pos_cursor() in
-  let x = if x <= 0 then x0 else x
-  and y = if y <= 0 then y0 else y in
-  set_cursor_ x y (* FIXME: (x,y) outside the console?? *)
+  if is_out_channel_atty stdout then (
+    let x0, y0 = pos_cursor() in
+    let x = if x <= 0 then x0 else x
+    and y = if y <= 0 then y0 else y in
+    set_cursor_ x y (* FIXME: (x,y) outside the console?? *)
+  )
 
 let move_cursor dx dy =
-  let x0, y0 = pos_cursor() in
-  let x = x0 + dx and y = y0 + dy in
-  let x = if x <= 0 then 1 else x
-  and y = if y <= 0 then 1 else y in
-  set_cursor_ x y (* FIXME: (x,y) outside the console?? *)
+  if is_out_channel_atty stdout then (
+    let x0, y0 = pos_cursor() in
+    let x = x0 + dx and y = y0 + dy in
+    let x = if x <= 0 then 1 else x
+    and y = if y <= 0 then 1 else y in
+    set_cursor_ x y (* FIXME: (x,y) outside the console?? *)
+  )
 
 let move_bol () =
-  let _, y0 = pos_cursor() in
-  set_cursor_ 1 y0
+  if is_out_channel_atty stdout then (
+    let _, y0 = pos_cursor() in
+    set_cursor_ 1 y0
+  )
 
 let saved_x = ref 0
 let saved_y = ref 0
 
 let save_cursor () =
-  let x,y = pos_cursor() in
-  saved_x := x;
-  saved_y := y
+  if is_out_channel_atty stdout then (
+    let x,y = pos_cursor() in
+    saved_x := x;
+    saved_y := y
+  )
 
 let restore_cursor () =
-  set_cursor_ !saved_x !saved_y
+  if is_out_channel_atty stdout then set_cursor_ !saved_x !saved_y
 
 
 let resize x y =
-  (* The specified width and height cannot be less than the width and
-     height of the console screen buffer's window. *)
-  let xmin, ymin = size() in
-  let x = if x <= xmin then xmin else x
-  and y = if y <= ymin then ymin else y in
-  resize_ x y
+  if is_out_channel_atty stdout then (
+    (* The specified width and height cannot be less than the width and
+       height of the console screen buffer's window. *)
+    let xmin, ymin = size() in
+    let x = if x <= xmin then xmin else x
+    and y = if y <= ymin then ymin else y in
+    resize_ x y
+  )
 
 
 external fill : out_channel -> char -> n:int -> x:int -> y:int -> int
@@ -164,21 +180,24 @@ external fill : out_channel -> char -> n:int -> x:int -> y:int -> int
    actually written. *)
 
 let erase loc =
-  let w, h = size() in
-  match loc with
-  | Eol ->
-    let x, y = pos_cursor() in
-    ignore(fill stdout ' ' ~n:(w - x + 1) ~x ~y)
-  | Above ->
-    let x, y = pos_cursor() in
-    ignore(fill stdout ' ' ~n:((y - 1) * w + x) ~x:1 ~y:1)
-  | Below ->
-    let x, y = pos_cursor() in
-    ignore(fill stdout ' ' ~n:(w - x + 1 + (h - y) * w) ~x ~y)
-  | Screen ->
-    ignore(fill stdout ' ' ~n:(w * h) ~x:1 ~y:1)
+  if is_out_channel_atty stdout then (
+    let w, h = size() in
+    match loc with
+    | Eol ->
+       let x, y = pos_cursor() in
+       ignore(fill stdout ' ' ~n:(w - x + 1) ~x ~y)
+    | Above ->
+       let x, y = pos_cursor() in
+       ignore(fill stdout ' ' ~n:((y - 1) * w + x) ~x:1 ~y:1)
+    | Below ->
+       let x, y = pos_cursor() in
+       ignore(fill stdout ' ' ~n:(w - x + 1 + (h - y) * w) ~x ~y)
+    | Screen ->
+       ignore(fill stdout ' ' ~n:(w * h) ~x:1 ~y:1)
+  )
 
 
+;;
 (* Local Variables: *)
 (* compile-command: "make ANSITerminal_win.cmo" *)
 (* End: *)
