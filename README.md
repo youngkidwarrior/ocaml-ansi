@@ -24,3 +24,8 @@ you clone this repository and compile and install this library by
 executing:
 
     build
+
+Documentation
+-------------
+
+The API may be [read online](http://chris00.github.io/ANSITerminal/doc/).
