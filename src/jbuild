@@ -12,5 +12,5 @@
  ((targets (ANSITerminal.ml ANSITerminal_stubs.c))
   (deps    (ANSITerminal_unix.ml ANSITerminal_win.ml
             ANSITerminal_unix_stubs.c ANSITerminal_win_stubs.c
-            ../choose_implementation.ml))
-  (action  (run ${OCAML} ../choose_implementation.ml))))
+            choose_implementation.ml))
+  (action  (run ${OCAML} choose_implementation.ml))))
