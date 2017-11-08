@@ -17,6 +17,12 @@
 (** This module offers basic control of ANSI compliant terminals and
     the windows shell.
 
+    The functions below do not send ANSI codes (i.e., do nothing or
+    only print the output) when then output is not connected to a TTY.
+    Functions providing information (such as {!pos_cursor}) fail when
+    in that situation.
+    TTY detection is configurable by changing the value of {!isatty}.
+
     This library is not thread safe.
 
     @author Christophe Troestler (Christophe.Troestler\@umons.ac.be)
@@ -162,3 +168,12 @@ val size : unit -> int * int
 val scroll : int -> unit
   (** [scroll n] scrolls the terminal by [n] lines, up (creating new
     lines at the bottom) if [n > 0] and down if [n < 0]. *)
+
+
+(** {2 TTY} *)
+
+val isatty : (Unix.file_descr -> bool) ref
+(** Function used to detect whether the current output is connected to
+   a TTY.  Defaults to [Unix.isatty]. *)
+
+;;

@@ -28,23 +28,33 @@ open Printf
 open Scanf
 include ANSITerminal_common
 
+let isatty = ref Unix.isatty
+
+let is_out_channel_atty ch = !isatty(Unix.descr_of_out_channel ch)
 
 (* Cursor *)
 
 let set_cursor x y =
-  if x <= 0 then (if y > 0 then printf "\027[%id%!" y)
-  else (* x > 0 *) if y <= 0 then printf "\027[%iG%!" x
-  else printf "\027[%i;%iH%!" y x
+  if is_out_channel_atty stdout then (
+    if x <= 0 then (if y > 0 then printf "\027[%id%!" y)
+    else (* x > 0 *) if y <= 0 then printf "\027[%iG%!" x
+    else printf "\027[%i;%iH%!" y x
+  )
 
 let move_cursor x y =
-  if x > 0 then printf "\027[%iC%!" x
-  else if x < 0 then printf "\027[%iD%!" (-x);
-  if y > 0 then printf "\027[%iB%!" y
-  else if y < 0 then printf "\027[%iA%!" (-y)
+  if is_out_channel_atty stdout then (
+    if x > 0 then printf "\027[%iC%!" x
+    else if x < 0 then printf "\027[%iD%!" (-x);
+    if y > 0 then printf "\027[%iB%!" y
+    else if y < 0 then printf "\027[%iA%!" (-y)
+  )
 
-let save_cursor () = printf "\027[s%!"
-let restore_cursor () = printf "\027[u%!"
+let save_cursor () =
+  if is_out_channel_atty stdout then printf "\027[s%!"
+let restore_cursor () =
+  if is_out_channel_atty stdout then printf "\027[u%!"
 let move_bol () = print_string "\r"; flush stdout
+
 
 (* Inpired by http://www.ohse.de/uwe/software/resize.c.html and
    http://qemacs.sourcearchive.com/documentation/0.3.1.cvs.20050713-5/tty_8c-source.html *)
@@ -88,17 +98,21 @@ let send_and_read_response fdin query fmt f =
 (* Report Cursor Position	<ESC>[{ROW};{COLUMN}R *)
 let pos_cursor_query = Bytes.of_string "\027[6n"
 let pos_cursor () =
-  try
-    send_and_read_response Unix.stdin pos_cursor_query
-                           "\027[%d;%dR" (fun y x -> (x,y))
-  with _ -> failwith "ANSITerminal.pos_cursor"
-
+  if is_out_channel_atty stdout then (
+    try
+      send_and_read_response Unix.stdin pos_cursor_query
+        "\027[%d;%dR" (fun y x -> (x,y))
+    with _ -> failwith "ANSITerminal.pos_cursor"
+  )
+  else failwith "ANSITerminal.pos_cursor: not a TTY"
 
 (* See also the output of 'resize -s x y' (e.g. in an Emacs shell). *)
 let resize width height =
-  if width <= 0 then invalid_arg "ANSITerminal.resize: width <= 0";
-  if height <= 0 then invalid_arg "ANSITerminal.resize: height <= 0";
-  printf "\027[8;%i;%it%!" height width
+  if is_out_channel_atty stdout then (
+    if width <= 0 then invalid_arg "ANSITerminal.resize: width <= 0";
+    if height <= 0 then invalid_arg "ANSITerminal.resize: height <= 0";
+    printf "\027[8;%i;%it%!" height width
+  )
 
 (* FIXME: what about the following recipe:
    If you run
@@ -109,24 +123,31 @@ let resize width height =
    read by your program on stdin. *)
 external size_ : Unix.file_descr -> int * int = "ANSITerminal_term_size"
 
-let size () = size_ Unix.stdin
+let size () =
+  if !isatty Unix.stdin then (
+    size_ Unix.stdin
+  )
+  else failwith "ANSITerminal.size: not a TTY"
 
 (* Erasing *)
 
 let erase loc =
-  print_string (match loc with
-  | Eol -> "\027[K"
-  | Above -> "\027[1J"
-  | Below ->"\027[0J"
-  | Screen -> "\027[2J");
-  flush stdout
+  if is_out_channel_atty stdout then (
+    print_string (match loc with
+                  | Eol -> "\027[K"
+                  | Above -> "\027[1J"
+                  | Below ->"\027[0J"
+                  | Screen -> "\027[2J");
+    flush stdout
+  )
 
 (* Scrolling *)
 
 let scroll lines =
-  if lines > 0 then printf "\027[%iS%!" lines
-  else if lines < 0 then printf "\027[%iT%!" (- lines)
-
+  if is_out_channel_atty stdout then (
+    if lines > 0 then printf "\027[%iS%!" lines
+    else if lines < 0 then printf "\027[%iT%!" (- lines)
+  )
 
 let style_to_string = function
   | Reset -> "0"
@@ -155,20 +176,25 @@ let style_to_string = function
   | Background Default -> "49"
 
 
-let print_with pr style txt =
-  pr "\027[";
-  pr (String.concat ";" (List.map style_to_string style));
-  pr "m";
+let print_with pr ~tty style txt =
+  if tty then (
+    pr "\027[";
+    pr (String.concat ";" (List.map style_to_string style));
+    pr "m";
+  );
   pr txt;
-  if !autoreset then pr "\027[0m"
+  if tty && !autoreset then pr "\027[0m"
 
-let print_string style txt = print_with print_string style txt
+let print_string style txt =
+  print_with print_string style txt ~tty:(is_out_channel_atty stdout)
 
-let prerr_string style txt = print_with prerr_string style txt
+let prerr_string style txt =
+  print_with prerr_string style txt ~tty:(is_out_channel_atty stderr)
 
 let printf style = ksprintf (print_string style)
 
 let eprintf style = ksprintf (prerr_string style)
+
 
 let to_string style txt =
   let s = "\027["
