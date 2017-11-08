@@ -3,7 +3,7 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew install ocaml opam
 fi
 
-OPAM_PKGS="oasis base-bytes"
+OPAM_PKGS="jbuilder base-bytes"
 
 export OPAMYES=1
 
@@ -22,8 +22,9 @@ eval `opam config env`
 opam install $OPAM_PKGS
 
 export OCAMLRUNPARAM=b
-make
+make all
 
 echo "-=-=- Tests -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 #make test
-./showcolors.native
+#jbuilder exec tests/showcolors.exe
+_build/default/tests/showcolors.exe

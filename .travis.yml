@@ -14,13 +14,13 @@ script: bash -ex .travis-ci.sh
 matrix:
   include:
   - os: linux
-    env: OPAM_SWITCH=3.12.1
-  - os: linux
-    env: OPAM_SWITCH=4.01.0
-  - os: linux
     env: OPAM_SWITCH=4.02.3
   - os: linux
     env: OPAM_SWITCH=4.03.0
+  - os: linux
+    env: OPAM_SWITCH=4.05.0
+  - os: linux
+    env: OPAM_SWITCH=4.06.0
   - os: osx
     osx_image: xcode7.3
 
