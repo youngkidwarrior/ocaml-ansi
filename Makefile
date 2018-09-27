@@ -1,16 +1,16 @@
 PKGVERSION = $(shell git describe --always --dirty)
 
 build:
-	jbuilder build @install --dev
+	dune build @install
 
 all: build
-	jbuilder build @runtest
+	dune build @runtest --force
 
 test: all
-	CAML_LD_LIBRARY_PATH=_build/src/ ./test.byte 
+	_build/default/tests/test.exe
 
 
 clean:
-	jbuilder clean
+	dune clean
 
 .PHONY: all build test clean

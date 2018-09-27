@@ -3,7 +3,7 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew install ocaml opam
 fi
 
-OPAM_PKGS="jbuilder base-bytes"
+OPAM_PKGS="dune base-bytes"
 
 export OPAMYES=1
 
@@ -26,5 +26,5 @@ make all
 
 echo "-=-=- Tests -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 #make test
-#jbuilder exec tests/showcolors.exe
+#dune exec tests/showcolors.exe
 _build/default/tests/showcolors.exe
