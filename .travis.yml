@@ -1,32 +1,22 @@
 language: c
-sudo: false
-addons:
-  apt:
-    sources:
-    - avsm
-    packages:
-    - ocaml
-    - ocaml-native-compilers
-    - opam
-
-script: bash -ex .travis-ci.sh
-
-matrix:
-  include:
-  - os: linux
-    env: OPAM_SWITCH=4.02.3
-  - os: linux
-    env: OPAM_SWITCH=4.03.0
-  - os: linux
-    env: OPAM_SWITCH=4.05.0
-  - os: linux
-    env: OPAM_SWITCH=4.06.0
-  - os: osx
-    osx_image: xcode7.3
-
+sudo: required
+os:
+  - linux
+  - osx
+env:
+  global:
+    - PACKAGE=ANSITerminal
+  matrix:
+    - OCAML_VERSION=4.07
+    - OCAML_VERSION=4.06
+    - OCAML_VERSION=4.05
+    - OCAML_VERSION=4.04
 cache:
   directories:
   - $HOME/.opam
+
+install: wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-opam.sh
+script: bash -ex .travis-opam.sh
 
 notifications:
   email:
