@@ -11,4 +11,4 @@ build_script:
   - build.cmd
 
 test_script:
-#  - showcolors.exe
+  - showcolors.exe
