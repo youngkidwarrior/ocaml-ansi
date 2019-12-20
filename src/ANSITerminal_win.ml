@@ -87,20 +87,28 @@ let int_of_state st =
     let win_unset_style () = printf "<unset>"
   *)
 
-external win_init : unit -> unit = "ANSITerminal_init"
 external win_set_style : out_channel -> int -> unit = "ANSITerminal_set_style"
-external win_unset_style : out_channel -> unit
+external win_unset_style : out_channel -> int -> unit
   = "ANSITerminal_unset_style"
+(* [win_unset_style] is the same as [win_set_style] except for the
+   error message. *)
+external win_get_style : out_channel -> int = "ANSITerminal_get_style"
 
-let () = win_init()
+let channel_styles = Hashtbl.create 8
 
 let set_style ch styles =
+  let prev_sty = win_get_style ch in
+  Hashtbl.add channel_styles ch prev_sty;
   let st = int_of_state (state_of_styles styles) in
   flush ch;
   win_set_style ch st;
   flush ch
 
-let unset_style ch = flush ch; win_unset_style ch
+let unset_style ch =
+  flush ch;
+  try win_unset_style ch (Hashtbl.find channel_styles ch);
+      Hashtbl.remove channel_styles ch
+  with Not_found -> ()
 
 
 let print ch styles txt =
@@ -117,7 +125,7 @@ let printf style = kprintf (print_string style)
 
 let eprintf style = ksprintf (prerr_string style)
 
-let sprintf style = sprintf
+let sprintf _style = sprintf
 
 external set_cursor_ : int -> int -> unit = "ANSITerminal_SetCursorPosition"
 external pos_cursor : unit -> int * int = "ANSITerminal_pos"
