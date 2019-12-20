@@ -1,1 +1,2 @@
-(lang dune 1.3)
+(lang dune 1.0)
+(name ANSITerminal)
