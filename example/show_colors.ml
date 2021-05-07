@@ -36,6 +36,8 @@ let color_to_string = function
     "white"
   | T.Default ->
     "def"
+  | _ ->
+    ""
 
 let () =
   (* Table *)

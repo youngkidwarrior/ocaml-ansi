@@ -1,5 +1,7 @@
-(* File: Ansi_unix.ml Allow colors, cursor movements, erasing,... under Unix
-   shells. *********************************************************************
+(* File: Ansi_unix.ml
+
+   Allow colors, cursor movements, erasing,... under Unix shells.
+   *********************************************************************
 
    Copyright 2004 by Troestler Christophe Christophe.Troestler(at)umons.ac.be
 
@@ -11,11 +13,6 @@
    This library is distributed in the hope that it will be useful, but WITHOUT
    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
    FOR A PARTICULAR PURPOSE. See the file LICENSE for more details. *)
-(** See the file(s) ctlseqs.* (unix; in Debian package xspecs)
-
-    CSI = "\027[" (ESC [)
-
-    man console_codes *)
 
 (* man tty(4) *)
 
@@ -209,6 +206,22 @@ let style_to_string = function
     "36"
   | Foreground White ->
     "37"
+  | Foreground Bright_black ->
+    "30;1"
+  | Foreground Bright_red ->
+    "31;1"
+  | Foreground Bright_green ->
+    "32;1"
+  | Foreground Bright_yellow ->
+    "33;1"
+  | Foreground Bright_blue ->
+    "34;1"
+  | Foreground Bright_magenta ->
+    "35;1"
+  | Foreground Bright_cyan ->
+    "36;1"
+  | Foreground Bright_white ->
+    "37;1"
   | Foreground Default ->
     "39"
   | Background Black ->
@@ -227,6 +240,22 @@ let style_to_string = function
     "46"
   | Background White ->
     "47"
+  | Background Bright_black ->
+    "40;1"
+  | Background Bright_red ->
+    "41;1"
+  | Background Bright_green ->
+    "42;1"
+  | Background Bright_yellow ->
+    "43;1"
+  | Background Bright_blue ->
+    "44;1"
+  | Background Bright_magenta ->
+    "45;1"
+  | Background Bright_cyan ->
+    "46;1"
+  | Background Bright_white ->
+    "47;1"
   | Background Default ->
     "49"
 

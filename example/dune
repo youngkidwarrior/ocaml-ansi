@@ -1,0 +1,3 @@
+(executable
+ (name show_colors)
+ (libraries ansi))

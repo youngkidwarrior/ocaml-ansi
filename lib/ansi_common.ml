@@ -22,6 +22,14 @@ type color =
   | Magenta
   | Cyan
   | White
+  | Bright_black
+  | Bright_red
+  | Bright_green
+  | Bright_yellow
+  | Bright_blue
+  | Bright_magenta
+  | Bright_cyan
+  | Bright_white
   | Default
 
 type style =
@@ -50,25 +58,57 @@ let cyan = Foreground Cyan
 
 let white = Foreground White
 
+let bright_black = Foreground Bright_black
+
+let bright_red = Foreground Bright_red
+
+let bright_green = Foreground Bright_green
+
+let bright_yellow = Foreground Bright_yellow
+
+let bright_blue = Foreground Bright_blue
+
+let bright_magenta = Foreground Bright_magenta
+
+let bright_cyan = Foreground Bright_cyan
+
+let bright_white = Foreground Bright_white
+
 let default = Foreground Default
 
-let on_black = Background Black
+let bg_black = Background Black
 
-let on_red = Background Red
+let bg_red = Background Red
 
-let on_green = Background Green
+let bg_green = Background Green
 
-let on_yellow = Background Yellow
+let bg_yellow = Background Yellow
 
-let on_blue = Background Blue
+let bg_blue = Background Blue
 
-let on_magenta = Background Magenta
+let bg_magenta = Background Magenta
 
-let on_cyan = Background Cyan
+let bg_cyan = Background Cyan
 
-let on_white = Background White
+let bg_white = Background White
 
-let on_default = Background Default
+let bg_bright_black = Background Bright_black
+
+let bg_bright_red = Background Bright_red
+
+let bg_bright_green = Background Bright_green
+
+let bg_bright_yellow = Background Bright_yellow
+
+let bg_bright_blue = Background Bright_blue
+
+let bg_bright_magenta = Background Bright_magenta
+
+let bg_bright_cyan = Background Bright_cyan
+
+let bg_bright_white = Background Bright_white
+
+let bg_default = Background Default
 
 type loc =
   | Eol

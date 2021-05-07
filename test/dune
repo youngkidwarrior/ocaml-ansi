@@ -1,3 +1,3 @@
-(tests
- (names showcolors test)
+(test
+ (name test)
  (libraries ansi))

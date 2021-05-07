@@ -36,6 +36,14 @@ type color =
   | Magenta
   | Cyan
   | White
+  | Bright_black
+  | Bright_red
+  | Bright_green
+  | Bright_yellow
+  | Bright_blue
+  | Bright_magenta
+  | Bright_cyan
+  | Bright_white
   | Default  (** Default color of the terminal *)
 
 (** Various styles for the text. [Blink] and [Hidden] may not work on every
@@ -77,31 +85,31 @@ val white : style
 val default : style
 (** Shortcut for [Foreground Default] *)
 
-val on_black : style
+val bg_black : style
 (** Shortcut for [Background Black] *)
 
-val on_red : style
+val bg_red : style
 (** Shortcut for [Background Red] *)
 
-val on_green : style
+val bg_green : style
 (** Shortcut for [Background Green] *)
 
-val on_yellow : style
+val bg_yellow : style
 (** Shortcut for [Background Yellow] *)
 
-val on_blue : style
+val bg_blue : style
 (** Shortcut for [Background Blue] *)
 
-val on_magenta : style
+val bg_magenta : style
 (** Shortcut for [Background Magenta] *)
 
-val on_cyan : style
+val bg_cyan : style
 (** Shortcut for [Background Cyan] *)
 
-val on_white : style
+val bg_white : style
 (** Shortcut for [Background White] *)
 
-val on_default : style
+val bg_default : style
 (** Shortcut for [Background Default] *)
 
 val set_autoreset : bool -> unit

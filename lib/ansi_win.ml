@@ -30,23 +30,23 @@ type rgb =
   | B
 
 let rgb_of_color = function
-  | Red ->
+  | Red | Bright_red ->
     [ R ]
-  | Green ->
+  | Green | Bright_green ->
     [ G ]
-  | Blue ->
+  | Blue | Bright_blue ->
     [ B ]
-  | Default ->
-    []
-  | White ->
+  | White | Bright_white ->
     [ R; G; B ]
-  | Cyan ->
+  | Cyan | Bright_cyan ->
     [ B; G ]
-  | Magenta ->
+  | Magenta | Bright_magenta ->
     [ B; R ]
-  | Yellow ->
+  | Yellow | Bright_yellow ->
     [ R; G ]
-  | Black ->
+  | Black | Bright_black ->
+    []
+  | Default ->
     []
 
 (* calls to SetConsoleTextAttribute replace one another, so foreground,
