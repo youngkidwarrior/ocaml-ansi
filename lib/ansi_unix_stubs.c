@@ -1,4 +1,4 @@
-/* File: ANSITerminal_unix_stubs.c
+/* File: Ansi_unix_stubs.c
 
    Copyright (C) 2010
 
@@ -15,25 +15,22 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the file
    LICENSE for more details. */
 
-#include <caml/mlvalues.h>
 #include <caml/alloc.h>
-#include <caml/memory.h>
 #include <caml/fail.h>
-
+#include <caml/memory.h>
+#include <caml/mlvalues.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 
 /* Based on http://www.ohse.de/uwe/software/resize.c.html */
 /* Inquire actual terminal size (this it what the kernel thinks - not
  * was the user on the over end of the phone line has really). */
-CAMLexport
-value ANSITerminal_term_size(value vfd)
-{
+CAMLexport value Ansi_term_size(value vfd) {
   CAMLparam1(vfd);
   CAMLlocal1(vsize);
   int fd = Int_val(vfd);
   int x, y;
-  
+
 #ifdef TIOCGSIZE
   struct ttysize win;
 #elif defined(TIOCGWINSZ)
@@ -41,13 +38,11 @@ value ANSITerminal_term_size(value vfd)
 #endif
 
 #ifdef TIOCGSIZE
-  if (ioctl(fd, TIOCGSIZE, &win))
-    failwith("ANSITerminal.size");
+  if (ioctl(fd, TIOCGSIZE, &win)) failwith("Ansi.size");
   x = win.ts_cols;
   y = win.ts_lines;
 #elif defined TIOCGWINSZ
-  if (ioctl(fd, TIOCGWINSZ, &win))
-    failwith("ANSITerminal.size");
+  if (ioctl(fd, TIOCGWINSZ, &win)) failwith("Ansi.size");
   x = win.ws_col;
   y = win.ws_row;
 #else
@@ -55,20 +50,19 @@ value ANSITerminal_term_size(value vfd)
     const char *s;
     s = getenv("LINES");
     if (s)
-      y = strtol(s,NULL,10);
+      y = strtol(s, NULL, 10);
     else
       y = 25;
     s = getenv("COLUMNS");
     if (s)
-      x = strtol(s,NULL,10);
+      x = strtol(s, NULL, 10);
     else
       x = 80;
   }
 #endif
-    
+
   vsize = caml_alloc_tuple(2);
   Store_field(vsize, 0, Val_int(x));
   Store_field(vsize, 1, Val_int(y));
   CAMLreturn(vsize);
 }
-

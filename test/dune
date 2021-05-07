@@ -1,0 +1,3 @@
+(tests
+ (names showcolors test)
+ (libraries ansi))

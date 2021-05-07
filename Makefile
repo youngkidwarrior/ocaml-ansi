@@ -1,16 +1,55 @@
-PKGVERSION = $(shell git describe --always --dirty)
+.PHONY: all
+all:
+	opam exec -- dune build --root . @install
 
-build:
-	dune build @install
+.PHONY: deps
+deps: ## Install development dependencies
+	opam install -y dune-release merlin ocamlformat utop ocaml-lsp-server
+	opam install --deps-only --with-test --with-doc -y .
 
-all: build
-	dune build @runtest --force
+.PHONY: create_switch
+create_switch:
+	opam switch create . --no-install
 
-test: all
-	_build/default/tests/test.exe
+.PHONY: switch
+switch: create_switch deps ## Create an opam switch and install development dependencies
 
+.PHONY: lock
+lock: ## Generate a lock file
+	opam lock -y .
 
-clean:
-	dune clean
+.PHONY: build
+build: ## Build the project, including non installable libraries and executables
+	opam exec -- dune build --root .
 
-.PHONY: all build test clean
+.PHONY: install
+install: all ## Install the packages on the system
+	opam exec -- dune install --root .
+
+.PHONY: start
+start: all ## Run the produced executable
+	opam exec -- dune exec --root . bin/main.exe $(ARGS)
+
+.PHONY: test
+test: ## Run the unit tests
+	opam exec -- dune build --root . @test/runtest -f
+
+.PHONY: clean
+clean: ## Clean build artifacts and other generated files
+	opam exec -- dune clean --root .
+
+.PHONY: doc
+doc: ## Generate odoc documentation
+	opam exec -- dune build --root . @doc
+
+.PHONY: fmt
+fmt: ## Format the codebase with ocamlformat
+	opam exec -- dune build --root . --auto-promote @fmt
+
+.PHONY: watch
+watch: ## Watch for the filesystem and rebuild on every change
+	opam exec -- dune build --root . --watch
+
+.PHONY: utop
+utop: ## Run a REPL and link with the project's libraries
+	opam exec -- dune utop --root . lib -- -implicit-bindings
